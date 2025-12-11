@@ -8,12 +8,12 @@
 
 :root {
     --color-primary-dark: #3c0056;
-    --color-primary-light: #0e4b02;
+    --color-primary-light: #0c4500;
     --color-accent-1: #ffc107;
     --color-accent-2: #e69a00;
     --color-secondary-link: #007bff;
     --color-text-dark: #333;
-    --color-background: #7a7b7c;
+    --color-background: #8b8d90;
     --color-card-bg: #ffffff;
     --color-white: white;
     --transition-speed: 0.3s;
@@ -28,7 +28,7 @@
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-    --color-primary-dark: #9b59b6;
+    --color-primary-dark: #3d0056;
     --color-primary-light: #2ecc71;
     --color-text-dark: #ecf0f1;
     --color-background: #2c3e50;
@@ -273,7 +273,7 @@ button:hover {
 footer {
     padding: 2% 3%;
     color: #e0f7fa;
-    background: linear-gradient(to right, #00372a, #006450, #016b68);
+    background: linear-gradient(to right, #012027, #002b35, #003c49);
     display: flex;
     flex-direction: column;
     margin-top: 1rem;
