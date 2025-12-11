@@ -1,0 +1,17 @@
+{% extends "applications/base.html" %}
+
+{% block title %}
+  student List
+{% endblock %}
+
+{% block content %}
+  <h2>Student List</h2>
+  <ul>
+    {% for student in students %}
+      <li>
+        <a href="{% url 'applications:student_detail' student.id %}">{{ student.first_name }} {{ student.last_name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'applications:add_student' %}">Add New Student</a>
+{% endblock %}

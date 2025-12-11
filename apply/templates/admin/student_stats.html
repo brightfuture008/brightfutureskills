@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>Student statistics</h1>
+  <p>Total students: {{ total }}</p>
+  <p>Male: {{ male }} ({{ total|yesno:"0,0" }})</p>
+  <p>Female: {{ female }}</p>
+  <h3>By region</h3>
+  <table class="table">
+    <thead><tr><th>Region</th><th>Count</th><th>Percent</th></tr></thead>
+    <tbody>
+      {% for r in by_region %}
+      <tr><td>{{ r.region }}</td><td>{{ r.count }}</td><td>{{ r.percent }}%</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

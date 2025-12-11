@@ -1,0 +1,21 @@
+{% extends "applications/base.html" %}
+
+{% block title %}
+    student detail
+{% endblock  %}
+
+{% block content %}
+    <h2>Student Detail</h2>
+    <p><strong>First Name:</strong> {{ student.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ student.last_name }}</p>
+    <p><strong>Email:</strong> {{ student.email }}</p>
+    <p><strong>Enrolled Courses:</strong></p>
+    <ul>
+        {% for course in student.courses.all %}
+            <li>{{ course.name }}</li>
+        {% empty %}
+            <li>No courses enrolled.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'applications:enroll_student' student.id %}">Enroll in a Course</a>
+{% endblock content %}

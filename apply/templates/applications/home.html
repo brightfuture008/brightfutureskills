@@ -1,0 +1,85 @@
+{% extends "applications/base.html" %}
+
+{% block title %}
+  Bright Skills Development Center - Home
+{% endblock %}
+
+{% block content %}
+  <main>
+    <section id="intro" class="intro">
+      <div class="container text-center">
+        <h2>Welcome to BRIGHT SKILLS DEVELOPMENT CENTER</h2>
+        <p class="lead mb-4">Your gateway to quality education and skill development.</p>
+        <a href="{% url 'applications:add_student' %}" class="btn btn-warning btn-lg shadow-sm">Apply Now</a>
+      </div>
+    </section>
+
+     <section class="course-list container my-5">
+      <h2>Available Courses</h2>
+      <ul>
+        {% for course in courses %}
+        <li>
+          <a href="{% url 'applications:course_detail' course.id %}">
+            <div class="course-card">
+              <div class="course-card-left">
+                <h3 class="card-title">{{ course.title }}</h3>
+                <p class="small muted">{{ course.course_id }} • Lecturer: {{ course.lecturer }}</p>
+              </div>
+              <div class="course-card-right">
+                <p class="course-duration">{{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
+                <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
+              </div>
+            </div>
+          </a>
+        </li>
+        {% empty %}
+        <li>No courses available.</li>
+        {% endfor %}
+      </ul>
+    </section>
+      
+      
+
+    <section id="about" class="about container my-5">
+      <h2 class="mb-4">ABOUT US</h2>
+      
+      <p class="lead text-center mb-5">
+        BRIGHT SKILLS DEVELOPMENT CENTER is dedicated to providing top-notch education and skill development programs to empower individuals for a brighter future. We believe in practical, hands-on learning guided by industry experts.
+      </p>
+
+      <div class="row text-center g-4">
+        
+        <div class="col-md-4">
+          <div class="p-4 bg-light rounded-3 h-100 shadow-sm border border-secondary">
+            <i class="bi bi-bullseye fs-1 text-success"></i>
+            <h3 class="card-title mt-3 mb-3">Our Mission</h3>
+            <p>To deliver high-quality, market-driven vocational and technical skills training that leads to immediate employment and entrepreneurship opportunities for our students.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-4 bg-light rounded-3 h-100 shadow-sm border border-secondary">
+            <i class="bi bi-eye fs-1 text-primary"></i>
+            <h3 class="card-title mt-3 mb-3">Our Vision</h3>
+            <p>To be the leading skill development center in the region, recognized for innovation, excellence in training, and producing highly competent graduates ready for the global economy.</p>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="p-4 bg-light rounded-3 h-100 shadow-sm border border-secondary">
+            <i class="bi bi-people fs-1 text-danger"></i>
+            <h3 class="card-title mt-3 mb-3">Core Values</h3>
+            <ul class="list-unstyled text-start small">
+              <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Excellence:</strong> Upholding the highest standards in education.</li>
+              <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Integrity:</strong>  Operating with honesty and transparency.</li>
+              <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Innovation:</strong> Continuously adapting curriculum to modern needs.</li>
+              <li><i class="bi bi-check-circle-fill text-success"></i><strong>Empowerment:</strong>  Fostering independence and critical thinking.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+   
+  </main>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "applications/base.html" %}
+{% block title %}Courses{% endblock title %}
+
+{% block content %}
+<section class="course-list">
+  <h2>Available Courses</h2>
+  <ul>
+    {% for course in courses %}
+    <li>
+      <a href="{% url 'applications:course_detail' course.id %}">
+        <div class="course-card">
+          <div class="course-card-left">
+            <h3 class="card-title">{{ course.title }}</h3>
+            <p class="small muted">{{ course.course_id }} • Lecturer: {{ course.lecturer }}</p>
+          </div>
+          <div class="course-card-right">
+            <p class="course-duration">{{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
+            <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
+          </div>
+        </div>
+      </a>
+    </li>
+    {% empty %}
+    <li>No courses yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock content %}

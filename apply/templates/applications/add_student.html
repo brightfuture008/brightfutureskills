@@ -1,0 +1,78 @@
+{% extends "applications/base.html" %}
+{% block title %}Apply - Step 1{% endblock title %}
+
+{% block content %}
+<section class="container my-5">
+  <h2 class="mb-4">Add New Student</h2>
+  <form method="post" class="student-form">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.fullname.label_tag }} {{ form.fullname }}
+    </div>
+    <div class="mb-3">
+      {{ form.email.label_tag }} {{ form.email }}
+    </div>
+    <div class="mb-3">
+      {{ form.gender.label_tag }} {{ form.gender }}
+    </div>
+    <div class="mb-3">
+      {{ form.phone.label_tag }} {{ form.phone }}
+    </div>
+    <div class="mb-3">
+      <label for="id_course">Course</label>
+      {{ form.course }}
+    </div>
+
+    <hr>
+    <h5>Home address (Tanzania)</h5>
+    <div class="address-row">
+      <div class="address-col">
+        <label for="id_region">Region</label>
+        <select id="id_region" name="region" class="form-select cascade-region"
+                data-url-template="{% url 'applications:ajax_districts' 0 %}">
+          <option value="">Choose region</option>
+          {% for r in regions %}
+            <option value="{{ r.id }}">{{ r.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="address-col">
+        <label for="id_district">District</label>
+        <select id="id_district" name="district" class="form-select cascade-district">
+          <option value="">First select region</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</section>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+$(function(){
+  const tpl = $('#id_region').data('url-template'); // e.g. /ajax/districts/0/
+  $('#id_region').on('change', function(){
+    const regionId = $(this).val();
+    const $district = $('#id_district');
+    $district.html('<option>Loading...</option>');
+    if (!regionId) { $district.html('<option value="">Choose region first</option>'); return; }
+    const url = tpl.replace('0', regionId);
+    $.getJSON(url)
+      .done(function(data){
+        let html = '<option value="">Choose district</option>';
+        if (data.districts && data.districts.length) {
+          data.districts.forEach(d => html += `<option value="${d.id}">${d.name}</option>`);
+        } else {
+          html = '<option value="">No districts found</option>';
+        }
+        $district.html(html);
+      })
+      .fail(function(){ $district.html('<option value="">Error loading districts</option>'); });
+  });
+
+  if ($('#id_region').val()) $('#id_region').trigger('change');
+});
+</script>
+{% endblock extra_js %}

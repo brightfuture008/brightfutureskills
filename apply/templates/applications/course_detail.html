@@ -1,0 +1,19 @@
+{% extends "applications/base.html" %}
+{% block title %}{{ course.title }}{% endblock title %}
+
+{% block content %}
+<section class="course-details">
+  <h2>{{ course.title }}</h2>
+  <p><strong>Course ID:</strong> {{ course.course_id }}</p>
+  <p><strong>Lecturer:</strong> {{ course.lecturer }}</p>
+  <p><strong>Duration:</strong> {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
+  <p><strong>Cost:</strong> Tsh {{ course.cost|floatformat:2 }}</p>
+  <hr>
+  <div class="course-description">
+    {{ course.description|linebreaks }}
+  </div>
+  <p style="margin-top:1rem;">
+    <a class="btn btn-primary" href="{% url 'applications:add_student' %}">Apply to this course</a>
+  </p>
+</section>
+{% endblock content %}
