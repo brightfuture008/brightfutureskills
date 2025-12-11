@@ -25,7 +25,12 @@ def add_student(request):
             student = form.save()
             return redirect('applications:registration_success', student_id=student.id)
     else:
-        form = StudentForm()
+        initial_data = {}
+        course_id = request.GET.get('course')
+        if course_id:
+            initial_data['course'] = course_id
+        form = StudentForm(initial=initial_data)
+
     courses = Course.objects.all()
     regions = Region.objects.all()
     return render(request, 'applications/add_student.html', {

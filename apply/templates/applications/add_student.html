@@ -6,17 +6,17 @@
   <h2 class="mb-4">Add New Student</h2>
   <form method="post" class="student-form">
     {% csrf_token %}
-    <div class="mb-3">
-      {{ form.fullname.label_tag }} {{ form.fullname }}
+    <div class="form-group-float">
+      {{ form.fullname }} {{ form.fullname.label_tag }}
     </div>
-    <div class="mb-3">
-      {{ form.email.label_tag }} {{ form.email }}
+    <div class="form-group-float">
+      {{ form.email }} {{ form.email.label_tag }}
     </div>
     <div class="mb-3">
       {{ form.gender.label_tag }} {{ form.gender }}
     </div>
-    <div class="mb-3">
-      {{ form.phone.label_tag }} {{ form.phone }}
+    <div class="form-group-float">
+      {{ form.phone }} {{ form.phone.label_tag }}
     </div>
     <div class="mb-3">
       <label for="id_course">Course</label>

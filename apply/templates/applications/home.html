@@ -15,66 +15,87 @@
     </section>
 
      <section class="course-list container my-5">
-      <h2>Available Courses</h2>
-      <ul>
+      <h2 class="section-title">Available Courses</h2>
+      <div class="row g-4">
         {% for course in courses %}
-        <li>
-          <a href="{% url 'applications:course_detail' course.id %}">
+        <div class="col-lg-4 col-md-6">
+          <div class="course-card-wrapper">
             <div class="course-card">
-              <div class="course-card-left">
-                <h3 class="card-title">{{ course.title }}</h3>
-                <p class="small muted">{{ course.course_id }} • Lecturer: {{ course.lecturer }}</p>
-              </div>
-              <div class="course-card-right">
-                <p class="course-duration">{{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
-                <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
-              </div>
+              <h3 class="card-title">{{ course.title }}</h3>
+              <p class="small muted">{{ course.course_id }} • {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
+              <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
+              <a href="{% url 'applications:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
             </div>
-          </a>
-        </li>
+          </div>
+        </div>
         {% empty %}
-        <li>No courses available.</li>
+        <p class="text-center">No courses available at the moment.</p>
         {% endfor %}
-      </ul>
+      </div>
     </section>
       
       
 
     <section id="about" class="about container my-5">
-      <h2 class="mb-4">ABOUT US</h2>
-      
-      <p class="lead text-center mb-5">
-        BRIGHT SKILLS DEVELOPMENT CENTER is dedicated to providing top-notch education and skill development programs to empower individuals for a brighter future. We believe in practical, hands-on learning guided by industry experts.
-      </p>
+        <h2 class="section-title">About Us</h2>
+        <p class="about-intro">
+            Bright Skills Development (SMC-Private) Ltd is a forward-thinking company based in the West B District of Urban West Region, Zanzibar. Our mission is to empower communities through technology, education, and inclusive enterprise development. We offer services in digital innovation, job creation, academic training, and community support. Our goal is to help individuals, especially youth and women, unlock their potential and thrive in a competitive global economy.
+        </p>
+        
+        <div class="row g-4 mt-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="about-card fade-in">
+                    <i class="bi bi-bullseye about-icon"></i>
+                    <h3 class="about-subtitle">Our Mission</h3>
+                    <p>To empower youth, women, and underserved communities by leveraging technology, education, and enterprise for economic independence and social impact.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="about-card fade-in">
+                    <i class="bi bi-eye about-icon"></i>
+                    <h3 class="about-subtitle">Our Vision</h3>
+                    <p>To become a leading center for innovation, technical training, and inclusive development in Zanzibar and beyond.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="about-card fade-in">
+                    <i class="bi bi-trophy about-icon"></i>
+                    <h3 class="about-subtitle">Our Goal</h3>
+                    <p>To build a sustainable future through skills development, digital empowerment, and job creation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section id="features" class="features container my-5">
+      <h2 class="section-title">Our Key Features</h2>
       <div class="row text-center g-4">
-        
-        <div class="col-md-4">
-          <div class="p-4 bg-light rounded-3 h-100 shadow-sm border border-secondary">
-            <i class="bi bi-bullseye fs-1 text-success"></i>
-            <h3 class="card-title mt-3 mb-3">Our Mission</h3>
-            <p>To deliver high-quality, market-driven vocational and technical skills training that leads to immediate employment and entrepreneurship opportunities for our students.</p>
+        <div class="col-lg-3 col-md-6">
+          <div class="feature-card fade-in">
+            <i class="bi bi-lightbulb feature-icon"></i>
+            <h3 class="feature-title">Digital Innovation</h3>
+            <p>Leveraging technology to create modern solutions and empower communities.</p>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="p-4 bg-light rounded-3 h-100 shadow-sm border border-secondary">
-            <i class="bi bi-eye fs-1 text-primary"></i>
-            <h3 class="card-title mt-3 mb-3">Our Vision</h3>
-            <p>To be the leading skill development center in the region, recognized for innovation, excellence in training, and producing highly competent graduates ready for the global economy.</p>
+        <div class="col-lg-3 col-md-6">
+          <div class="feature-card fade-in">
+            <i class="bi bi-briefcase feature-icon"></i>
+            <h3 class="feature-title">Job Creation</h3>
+            <p>Providing market-driven skills that lead to employment and entrepreneurship.</p>
           </div>
         </div>
-        
-        <div class="col-md-4">
-          <div class="p-4 bg-light rounded-3 h-100 shadow-sm border border-secondary">
-            <i class="bi bi-people fs-1 text-danger"></i>
-            <h3 class="card-title mt-3 mb-3">Core Values</h3>
-            <ul class="list-unstyled text-start small">
-              <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Excellence:</strong> Upholding the highest standards in education.</li>
-              <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Integrity:</strong>  Operating with honesty and transparency.</li>
-              <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Innovation:</strong> Continuously adapting curriculum to modern needs.</li>
-              <li><i class="bi bi-check-circle-fill text-success"></i><strong>Empowerment:</strong>  Fostering independence and critical thinking.</li>
-            </ul>
+        <div class="col-lg-3 col-md-6">
+          <div class="feature-card fade-in">
+            <i class="bi bi-mortarboard feature-icon"></i>
+            <h3 class="feature-title">Academic Training</h3>
+            <p>Offering high-quality vocational and technical training from industry experts.</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="feature-card fade-in">
+            <i class="bi bi-people feature-icon"></i>
+            <h3 class="feature-title">Community Support</h3>
+            <p>Focusing on youth, women, and underserved groups for inclusive development.</p>
           </div>
         </div>
       </div>

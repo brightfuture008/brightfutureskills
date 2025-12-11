@@ -1,19 +1,25 @@
-{% extends "applications/base.html" %}
-{% block title %}{{ course.title }}{% endblock title %}
+{% extends 'applications/base.html' %}
+
+{% block title %}{{ course.title }} - Course Details{% endblock %}
 
 {% block content %}
-<section class="course-details">
-  <h2>{{ course.title }}</h2>
-  <p><strong>Course ID:</strong> {{ course.course_id }}</p>
-  <p><strong>Lecturer:</strong> {{ course.lecturer }}</p>
-  <p><strong>Duration:</strong> {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
-  <p><strong>Cost:</strong> Tsh {{ course.cost|floatformat:2 }}</p>
-  <hr>
-  <div class="course-description">
-    {{ course.description|linebreaks }}
-  </div>
-  <p style="margin-top:1rem;">
-    <a class="btn btn-primary" href="{% url 'applications:add_student' %}">Apply to this course</a>
-  </p>
-</section>
+<div class="container my-5">
+    <div class="course-details fade-in">
+        <h2 class="section-title">{{ course.title }}</h2>
+        
+        <p><strong>Course ID:</strong> {{ course.course_id }}</p>
+        <p><strong>Lecturer:</strong> {{ course.lecturer|default:"N/A" }}</p>
+        <p><strong>Duration:</strong> {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
+        <p><strong>Cost:</strong> Tsh {{ course.cost|floatformat:2 }}</p>
+        
+        {% if course.description %}
+            <p><strong>Description:</strong> {{ course.description|linebreaksbr }}</p>
+        {% endif %}
+
+        <div class="details-actions">
+            <a href="{% url 'applications:course_list' %}" class="btn btn-secondary">Go Back</a>
+            <a href="{% url 'applications:add_student' %}?course={{ course.id }}" class="btn btn-primary">Enroll Now</a>
+        </div>
+    </div>
+</div>
 {% endblock content %}
