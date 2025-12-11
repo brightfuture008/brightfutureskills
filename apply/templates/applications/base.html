@@ -14,21 +14,21 @@
 </head>
 <body>
   <header>
-    <h1 class="site-title">BRIGHT SKILLS DEVELOPMENT CENTER</h1>
+    <div class="top-bar">
+      <h1 class="site-title">BRIGHT SKILLS DEVELOPMENT CENTER</h1>
+      <div class="theme-toggler" id="theme-toggler" title="Toggle light/dark theme">
+        <i class="bi bi-moon-stars-fill icon moon"></i>
+        <i class="bi bi-sun-fill icon sun"></i>
+      </div>
+    </div>
     <div class="header-inner">
       <nav class="nav-bar">
         <ul class="nav-links">
           <li><a href="{% url 'applications:home' %}">Home</a></li>
           <li><a href="{% url 'applications:add_student' %}">Apply</a></li>
           <li><a href="{% url 'applications:course_list' %}">Courses</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
-      <div class="theme-toggler" id="theme-toggler" title="Toggle light/dark theme">
-        <i class="bi bi-moon-stars-fill icon moon"></i>
-        <i class="bi bi-sun-fill icon sun"></i>
-      </div>
     </div>
   </header>
 
