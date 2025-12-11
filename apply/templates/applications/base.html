@@ -14,23 +14,20 @@
 </head>
 <body>
   <header>
-    <div class="top-bar">
-      <h1 class="site-title">BRIGHT SKILLS DEVELOPMENT CENTER</h1>
-      <div class="theme-toggler" id="theme-toggler" title="Toggle light/dark theme">
-        <i class="bi bi-moon-stars-fill icon moon"></i>
-        <i class="bi bi-sun-fill icon sun"></i>
-      </div>
-    </div>
-    <div class="header-inner">
-      <nav class="nav-bar">
-        <ul class="nav-links">
-          <li><a href="{% url 'applications:home' %}">Home</a></li>
-          <li><a href="{% url 'applications:add_student' %}">Apply</a></li>
-          <li><a href="{% url 'applications:course_list' %}">Courses</a></li>
-        </ul>
-      </nav>
+    <h1 class="site-title"><a href="{% url 'applications:home' %}">BRIGHT SKILLS DEVELOPMENT CENTER</a></h1>
+    <div class="theme-toggler" id="theme-toggler" title="Toggle light/dark theme">
+      <i class="bi bi-moon-stars-fill icon moon"></i>
+      <i class="bi bi-sun-fill icon sun"></i>
     </div>
   </header>
+  <nav class="nav-bar">
+    <ul class="nav-links">
+      <li><a href="{% url 'applications:home' %}">Home</a></li>
+      <li><a href="{% url 'applications:add_student' %}">Apply</a></li>
+      <li><a href="{% url 'applications:course_list' %}">Courses</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
   
   <div class="toast-wrap" id="toast-wrap" aria-live="polite" aria-atomic="true"></div>
