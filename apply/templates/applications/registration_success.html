@@ -1,0 +1,35 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm" style="max-width: 700px; margin: auto; border: 1px solid var(--glass-border);
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    ">
+        <div class="card-header text-white text-center" style="background-color: var(--toast-success);">
+            <h2 class="h4 mb-0">Registration Successful!</h2>
+        </div>
+        <div class="card-body p-4">
+            <p class="lead text-center">Congratulations, <strong>{{ student.fullname }}</strong>! Your registration is complete.</p>
+            <hr>
+            <h5 class="card-title text-center mb-4">Your Registration Details</h5>
+            
+            <p style="color: #eee;"><strong>Registration Code:</strong> <span class="text-warning fw-bold">{{ student.code }}</span></p>
+            <p style="color: #eee;"><strong>Full Name:</strong> {{ student.fullname }}</p>
+            <p style="color: #eee;"><strong>Email:</strong> {{ student.email }}</p>
+            <p style="color: #eee;"><strong>Phone:</strong> {{ student.phone }}</p>
+            <p style="color: #eee;"><strong>Course:</strong> {{ student.course.title }}</p>
+            <p style="color: #eee;"><strong>Region:</strong> {{ student.region.name }}</p>
+            <p style="color: #eee;"><strong>District:</strong> {{ student.district.name }}</p>
+            {% if student.session %}<p><strong>Session:</strong> {{ student.session.name }}</p>{% endif %}
+
+            <div class="text-center mt-4 d-flex justify-content-center gap-2">
+                <a href="{% url 'applications:edit_student' student_id=student.id %}" class="btn btn-secondary">Edit Information</a>
+                <a href="{% url 'applications:home' %}" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

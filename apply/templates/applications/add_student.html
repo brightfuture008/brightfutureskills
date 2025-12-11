@@ -22,6 +22,13 @@
       <label for="id_course">Course</label>
       {{ form.course }}
     </div>
+    <div class="mb-3" id="session-container" style="display: none;">
+      <label for="id_session">Session</label>
+      <select id="id_session" name="session" class="form-select">
+          <option value="">First select a course</option>
+      </select>
+    </div>
+
 
     <hr>
     <h5>Home address (Tanzania)</h5>
@@ -51,7 +58,8 @@
 
 {% block extra_js %}
 <script>
-$(function(){
+$(document).ready(function(){
+  // For cascading districts
   const tpl = $('#id_region').data('url-template'); // e.g. /ajax/districts/0/
   $('#id_region').on('change', function(){
     const regionId = $(this).val();
@@ -73,6 +81,32 @@ $(function(){
   });
 
   if ($('#id_region').val()) $('#id_region').trigger('change');
+
+  // For cascading sessions based on course
+  const sessionUrlTemplate = "{% url 'applications:ajax_sessions' 0 %}";
+  $('#id_course').on('change', function(){
+    const courseId = $(this).val();
+    const $sessionSelect = $('#id_session');
+    const $sessionContainer = $('#session-container');
+
+    if (!courseId) {
+      $sessionContainer.hide();
+      return;
+    }
+
+    const url = sessionUrlTemplate.replace('0', courseId);
+    $.getJSON(url)
+      .done(function(data){
+        if (data.sessions && data.sessions.length) {
+          let html = '<option value="">Choose session</option>';
+          data.sessions.forEach(s => html += `<option value="${s.id}">${s.name}</option>`);
+          $sessionSelect.html(html);
+          $sessionContainer.show();
+        } else {
+          $sessionContainer.hide();
+        }
+      });
+  });
 });
 </script>
 {% endblock extra_js %}

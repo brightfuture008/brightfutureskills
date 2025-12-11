@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from .models import Student, Course, Region, District
+from django.contrib import messages
+from .models import Student, Course, Region, District, Session
 from .forms import StudentForm, CourseForm
 
 app_name = 'applications'
@@ -22,7 +23,7 @@ def add_student(request):
         form = StudentForm(request.POST)
         if form.is_valid():
             student = form.save()
-            return redirect('applications:home')
+            return redirect('applications:registration_success', student_id=student.id)
     else:
         form = StudentForm()
     courses = Course.objects.all()
@@ -62,10 +63,28 @@ def enroll_student(request, student_id):
         form = StudentForm(instance=student)
     return render(request, 'applications/enroll_student.html', {'form': form, 'student': student})
 
+def edit_student(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            updated_student = form.save()
+            # Redirect back to the success/details page to show the updated info
+            return redirect('applications:registration_success', student_id=updated_student.id)
+    else:
+        # For a GET request, show the form pre-filled with the student's data
+        form = StudentForm(instance=student)
+    return render(request, 'applications/edit_student.html', {'form': form, 'student': student})
+
 def ajax_districts(request, region_id):
     districts = list(District.objects.filter(region_id=region_id).values('id', 'name'))
     return JsonResponse({'districts': districts})
 
+def ajax_sessions(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    sessions = list(course.sessions.all().values('id', 'name'))
+    return JsonResponse({'sessions': sessions})
 
-
-
+def registration_success(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    return render(request, 'applications/registration_success.html', {'student': student})

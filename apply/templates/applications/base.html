@@ -14,6 +14,7 @@
 </head>
 <body>
   <header>
+    <h1 class="site-title">BRIGHT SKILLS DEVELOPMENT CENTER</h1>
     <div class="header-inner">
       <nav class="nav-bar">
         <ul class="nav-links">
@@ -24,6 +25,10 @@
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
+      <div class="theme-toggler" id="theme-toggler" title="Toggle light/dark theme">
+        <i class="bi bi-moon-stars-fill icon moon"></i>
+        <i class="bi bi-sun-fill icon sun"></i>
+      </div>
     </div>
   </header>
 
@@ -70,7 +75,7 @@
         </section>
 
         <hr>
-        <p>&copy; 2024 BRIGHT SKILLS DEVELOPMENT CENTER. All rights reserved.</p>
+        <p>&copy; 2025 BRIGHT SKILLS DEVELOPMENT CENTER. All rights reserved.</p>
       </div>
     </footer>
 
@@ -79,6 +84,40 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     
+    <script>
+      // --- UI Enhancements: Theme Toggler & Animations ---
+      document.addEventListener('DOMContentLoaded', function () {
+        // Theme Toggler
+        const themeToggler = document.getElementById('theme-toggler');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        if (themeToggler) {
+          themeToggler.addEventListener('click', () => {
+            let newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+          });
+        }
+
+        // Fade-in animations on scroll
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        // Apply fade-in to cards and other elements
+        document.querySelectorAll('.course-card, .course-list li, .about, form').forEach(el => {
+          el.classList.add('fade-in');
+          observer.observe(el);
+        });
+      });
+    </script>
+
     <script>
   (function(){
     const toastWrap = document.getElementById('toast-wrap');
