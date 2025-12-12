@@ -1,12 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from .models import Student, Course, Region, District, Session
 from .forms import StudentForm, CourseForm
 
 app_name = 'applications'
 
 def home(request):
+    """
+    Renders the home page. If the user is logged in and has a student profile,
+    it redirects them to their profile page.
+    """
+    if request.user.is_authenticated:
+        # Check if a student profile exists for the logged-in user
+        student = Student.objects.filter(user=request.user).first()
+        if student:
+            # Redirect to the student's success/details page
+            return redirect('applications:student_profile')
+            
     all_courses = Course.objects.all()
     return render(request, 'applications/home.html', {'courses': all_courses})
 
@@ -18,12 +31,25 @@ def course_list(request):
     all_courses = Course.objects.all()
     return render(request, 'applications/course_list.html', {'courses': all_courses})
 
+@login_required
 def add_student(request):
+    """
+    Handles student registration. If the user is already registered,
+    it shows them a message instead of the form.
+    """
+    # Check if a student profile already exists for the logged-in user
+    if Student.objects.filter(user=request.user).exists():
+        # User is already registered, show the 'already_registered' page
+        profile_url = reverse('applications:student_profile')
+        return render(request, 'applications/already_registered.html', {'profile_url': profile_url})
+
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
-            student = form.save()
-            return redirect('applications:registration_success', student_id=student.id)
+            student = form.save(commit=False)
+            student.user = request.user  # Link the student to the logged-in user
+            student.save()
+            return redirect('applications:student_profile') # Redirect to their new profile
     else:
         initial_data = {}
         course_id = request.GET.get('course')
@@ -57,6 +83,15 @@ def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     return render(request, 'applications/course_detail.html', {'course': course})
 
+@login_required
+def student_profile(request):
+    """
+    Displays the registered student's information.
+    This view renders the 'registration_success.html' template.
+    """
+    student = get_object_or_404(Student, user=request.user)
+    return render(request, 'applications/registration_success.html', {'student': student})
+
 def enroll_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     if request.method == 'POST':
@@ -68,18 +103,19 @@ def enroll_student(request, student_id):
         form = StudentForm(instance=student)
     return render(request, 'applications/enroll_student.html', {'form': form, 'student': student})
 
-def edit_student(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
+@login_required
+def edit_student(request):
+    student = get_object_or_404(Student, user=request.user)
     if request.method == 'POST':
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
-            updated_student = form.save()
-            # Redirect back to the success/details page to show the updated info
-            return redirect('applications:registration_success', student_id=updated_student.id)
+            form.save()
+            messages.success(request, 'Your information has been updated successfully!')
+            return redirect('applications:student_profile')
     else:
-        # For a GET request, show the form pre-filled with the student's data
         form = StudentForm(instance=student)
-    return render(request, 'applications/edit_student.html', {'form': form, 'student': student})
+    
+    return render(request, 'applications/edit_student.html', {'form': form})
 
 def ajax_districts(request, region_id):
     districts = list(District.objects.filter(region_id=region_id).values('id', 'name'))
@@ -89,7 +125,3 @@ def ajax_sessions(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     sessions = list(course.sessions.all().values('id', 'name'))
     return JsonResponse({'sessions': sessions})
-
-def registration_success(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
-    return render(request, 'applications/registration_success.html', {'student': student})

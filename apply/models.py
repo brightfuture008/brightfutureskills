@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+from django.contrib.auth.models import User
 from django.urls import reverse
 
 class Session(models.Model):
@@ -38,6 +39,7 @@ class District(models.Model):
         return f"{self.name} ({self.region.name})"
 
 class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     GENDER_CHOICES = (('M','Male'),('F','Female'))
     code = models.CharField(max_length=32, unique=True, editable=False)
     fullname = models.CharField(max_length=200)

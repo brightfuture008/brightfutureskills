@@ -1,0 +1,25 @@
+{% extends "applications/base.html" %}
+
+{% block content %}
+<style>
+    .notice-container {
+        max-width: 600px;
+        margin: 4rem auto;
+        padding: 2rem;
+        text-align: center;
+        background: var(--color-card-bg);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .notice-container h2 {
+        color: var(--color-primary-dark);
+    }
+</style>
+
+<div class="container notice-container">
+    <h2>Tayari Umesajiliwa</h2>
+    <p class="lead">Mfumo unaonyesha tayari una wasifu (profile) katika chuo chetu.</p>
+    <p>Unaweza kuangalia au kubadilisha taarifa zako kwa kubonyeza kitufe hapa chini.</p>
+    <a href="{{ profile_url }}" class="btn btn-primary mt-3">Tazama Taarifa Zangu</a>
+</div>
+{% endblock content %}
