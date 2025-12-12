@@ -25,3 +25,9 @@ def profile_redirect_view(request):
     Redirects from the default /accounts/profile/ to the project's home page.
     """
     return redirect('apply:home')
+
+def logout_redirect_view(request):
+    """
+    Redirects from the default /accounts/logout/ to the project's home page after logout.
+    """
+    return redirect('users:login')
