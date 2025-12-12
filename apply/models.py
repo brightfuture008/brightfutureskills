@@ -17,10 +17,13 @@ class Course(models.Model):
     duration_months = models.PositiveSmallIntegerField(default=1, help_text="Duration in months")    
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='course_images/', blank=True, null=True, help_text="Upload a picture for the course.")
     sessions = models.ManyToManyField(Session, blank=True, related_name='courses')
 
     def __str__(self):
-        return f"{self.title} ({self.course_id})"
+        if self.course_id:
+            return f"{self.title} ({self.course_id})"
+        return self.title
 
 class Region(models.Model):
     name = models.CharField(max_length=120, unique=True)

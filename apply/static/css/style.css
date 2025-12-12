@@ -467,6 +467,12 @@ footer a:hover {
     border: 1px solid var(--glass-border);
 }
 
+.course-details-img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
 .course-details-body {
     padding: 2rem;
 }
@@ -621,6 +627,12 @@ footer a:hover {
     font-weight: 700;
     color: var(--color-primary-dark);
     margin-bottom: 0.5rem;
+}
+.course-card .card-img-top {
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 .small.muted { color: #666; font-size: 0.9rem; }
 .course-card .btn { margin-top: auto; }
