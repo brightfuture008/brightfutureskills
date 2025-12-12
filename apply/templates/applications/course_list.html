@@ -12,11 +12,6 @@
             <div class="col-lg-4 col-md-6">
                 <div class="course-card-wrapper">
                     <div class="course-card">
-                        {% if course.image %}
-                            <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
-                        {% else %}
-                            <img src="{% static 'images/back.webp' %}" class="card-img-top" alt="Default course image">
-                        {% endif %}
                         <h3 class="card-title">{{ course.title }}</h3>
                         <p class="small muted">{{ course.course_id }} • {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
                         <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>

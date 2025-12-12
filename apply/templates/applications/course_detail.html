@@ -6,12 +6,6 @@
 {% block content %}
 <section class="container my-5">
     <div class="course-details-card course-details fade-in">
-        {% if course.image %}
-            <img src="{{ course.image.url }}" alt="{{ course.title }}" class="course-details-img">
-        {% else %}
-            <img src="{% static 'images/back.webp' %}" alt="Default course image" class="course-details-img">
-        {% endif %}
-
         <div class="course-details-body">
             <h2 class="course-details-title">{{ course.title }}</h2>
             <div class="course-meta">

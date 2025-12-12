@@ -56,7 +56,7 @@ def add_student(request):
 
 def add_course(request):
     if request.method == 'POST':
-        form = CourseForm(request.POST, request.FILES)
+        form = CourseForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('apply:course_list')
