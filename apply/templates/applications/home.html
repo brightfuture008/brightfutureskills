@@ -9,8 +9,8 @@
     <section id="intro" class="intro">
       <div class="container text-center">
         <h2>Welcome to BRIGHT SKILLS DEVELOPMENT CENTER</h2>
-        <p class="lead mb-4">Your gateway to quality education and skill development.</p>
-        <a href="{% url 'applications:add_student' %}" class="btn btn-warning btn-lg shadow-sm">Apply Now</a>
+        <p class="lead mb-4">Your gateway to quality education and skill development.</p> 
+        <a href="{% url 'apply:add_student' %}" class="btn btn-warning btn-lg shadow-sm">Apply Now</a>
       </div>
     </section>
 
@@ -23,8 +23,8 @@
             <div class="course-card">
               <h3 class="card-title">{{ course.title }}</h3>
               <p class="small muted">{{ course.course_id }} • {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
-              <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
-              <a href="{% url 'applications:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
+              <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p> 
+              <a href="{% url 'apply:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
             </div>
           </div>
         </div>

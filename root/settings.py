@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost','.pythonanywhere.com']
 INSTALLED_APPS = [
     # Custom apps
     'apply',
+    'users',
 
     # Django default apps
     'django.contrib.admin',
@@ -124,3 +125,4 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'users:login'

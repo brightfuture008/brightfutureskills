@@ -2,12 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse
 from .models import Student, Course, Region, District, Session
 from .forms import StudentForm, CourseForm
-app_name = 'applications'
 
 def home(request):
     """
@@ -19,7 +16,7 @@ def home(request):
         student = Student.objects.filter(user=request.user).first()
         if student:
             # Redirect to the student's success/details page
-            return redirect('applications:student_profile')
+            return redirect('apply:student_profile')
             
     all_courses = Course.objects.all()
     return render(request, 'applications/home.html', {'courses': all_courses})
@@ -35,13 +32,12 @@ def course_list(request):
 @login_required
 def add_student(request):
     """
-    Handles student registration. If the user is already registered,
-    it shows them a message instead of the form.
+    Handles student application form for logged-in users.
+    If the user already has a student profile, it redirects them.
     """
-    # Check if a student profile already exists for the logged-in user
-    if Student.objects.filter(user=request.user).exists():
-        # User is already registered, show the 'already_registered' page
-        profile_url = reverse('applications:student_profile')
+    if hasattr(request.user, 'student'):
+        # User is already registered as a student, show the 'already_registered' page
+        profile_url = reverse('apply:student_profile')
         return render(request, 'applications/already_registered.html', {'profile_url': profile_url})
 
     if request.method == 'POST':
@@ -50,19 +46,17 @@ def add_student(request):
             student = form.save(commit=False)
             student.user = request.user  # Link the student to the logged-in user
             student.save()
-            return redirect('applications:student_profile') # Redirect to their new profile
+            return redirect('apply:student_profile')
     else:
         initial_data = {}
         course_id = request.GET.get('course')
         if course_id:
             initial_data['course'] = course_id
         form = StudentForm(initial=initial_data)
-
-    courses = Course.objects.all()
+    
     regions = Region.objects.all()
     return render(request, 'applications/add_student.html', {
         'form': form,
-        'courses': courses,
         'regions': regions,
     })
 
@@ -71,7 +65,7 @@ def add_course(request):
         form = CourseForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('applications:course_list')
+            return redirect('apply:course_list')
     else:
         form = CourseForm()
     return render(request, 'applications/add_course.html', {'form': form})
@@ -99,7 +93,7 @@ def enroll_student(request, student_id):
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
-            return redirect('applications:student_detail', student_id=student.id)
+            return redirect('apply:student_detail', student_id=student.id)
     else:
         form = StudentForm(instance=student)
     return render(request, 'applications/enroll_student.html', {'form': form, 'student': student})
@@ -112,31 +106,11 @@ def edit_student(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your information has been updated successfully!')
-            return redirect('applications:student_profile')
+            return redirect('apply:student_profile')
     else:
         form = StudentForm(instance=student)
     
     return render(request, 'applications/edit_student.html', {'form': form})
-
-def signup(request):
-    """
-    Handles new user registration.
-    """
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # Log the user in automatically
-            return redirect('applications:home') # Redirect to home page
-    else:
-        form = UserCreationForm()
-    return render(request, 'applications/signup.html', {'form': form})
-
-def profile_redirect_view(request):
-    """
-    Redirects from the default /accounts/profile/ to the project's home page.
-    """
-    return redirect('applications:home')
 
 def ajax_districts(request, region_id):
     districts = list(District.objects.filter(region_id=region_id).values('id', 'name'))

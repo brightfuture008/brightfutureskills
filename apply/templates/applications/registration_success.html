@@ -26,8 +26,8 @@
             {% if student.session %}<p><strong>Session:</strong> {{ student.session.name }}</p>{% endif %}
 
             <div class="text-center mt-4 d-flex justify-content-center gap-2">
-                <a href="{% url 'applications:edit_student' %}" class="btn btn-secondary">Edit Information</a>
-                <a href="{% url 'applications:home' %}" class="btn btn-primary">Back to Home</a>
+                <a href="{% url 'apply:edit_student' %}" class="btn btn-secondary">Edit Information</a>
+                <a href="{% url 'apply:home' %}" class="btn btn-primary">Back to Home</a>
             </div>
         </div>
     </div>

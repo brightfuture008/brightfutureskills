@@ -16,7 +16,7 @@
               <h3 class="card-title">{{ course.title }}</h3>
               <p class="small muted">{{ course.course_id }} • {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
               <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
-              <a href="{% url 'applications:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
+              <a href="{% url 'apply:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
             </div>
           </div>
         </div>

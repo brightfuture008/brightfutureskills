@@ -17,8 +17,8 @@
         {% endif %}
 
         <div class="details-actions">
-            <a href="{% url 'applications:course_list' %}" class="btn btn-secondary">Go Back</a>
-            <a href="{% url 'applications:add_student' %}?course={{ course.id }}" class="btn btn-primary">Enroll Now</a>
+            <a href="{% url 'apply:course_list' %}" class="btn btn-secondary">Go Back</a>
+            <a href="{% url 'apply:add_student' %}?course={{ course.id }}" class="btn btn-primary">Enroll Now</a>
         </div>
     </div>
 </div>
