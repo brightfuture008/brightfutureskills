@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse
 from .models import Student, Course, Region, District, Session
 from .forms import StudentForm, CourseForm
-
 app_name = 'applications'
 
 def home(request):
@@ -116,6 +117,26 @@ def edit_student(request):
         form = StudentForm(instance=student)
     
     return render(request, 'applications/edit_student.html', {'form': form})
+
+def signup(request):
+    """
+    Handles new user registration.
+    """
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Log the user in automatically
+            return redirect('applications:home') # Redirect to home page
+    else:
+        form = UserCreationForm()
+    return render(request, 'applications/signup.html', {'form': form})
+
+def profile_redirect_view(request):
+    """
+    Redirects from the default /accounts/profile/ to the project's home page.
+    """
+    return redirect('applications:home')
 
 def ajax_districts(request, region_id):
     districts = list(District.objects.filter(region_id=region_id).values('id', 'name'))
