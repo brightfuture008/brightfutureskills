@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from django.contrib.auth import views as auth_views
 
 app_name = 'applications'
 
@@ -9,10 +8,6 @@ urlpatterns = [
     path('apply/', views.add_student, name='add_student'),
     path('my-profile/', views.student_profile, name='student_profile'),
     path('my-profile/edit/', views.edit_student, name='edit_student'),
-
-    # Authentication URLs
-    path('login/', auth_views.LoginView.as_view(template_name='applications/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='applications:home'), name='logout'),
 
     # Admin/staff-like views (optional, can be secured further)
     path('admin/students/', views.student_list, name='student_list'),
