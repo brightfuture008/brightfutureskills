@@ -8,9 +8,9 @@ class StudentForm(forms.ModelForm):
         fields = ['fullname','email','gender','phone','course','session','region','district']
         widgets = {
             'gender': forms.Select(attrs={'class':'form-select'}),
-            'course': forms.SelectMultiple(attrs={'class':'form-select select2-course'}),
-            'region': forms.Select(attrs={'class':'form-select cascade-region'}),
-            'district': forms.Select(attrs={'class':'form-select cascade-district'}),
+            'course': forms.SelectMultiple(attrs={'class': 'select2-course', 'data-placeholder': 'Select one or more courses'}),
+            'region': forms.Select(attrs={'class': 'form-select cascade-region'}),
+            'district': forms.Select(attrs={'class': 'form-select cascade-district'}),
             'phone': forms.TextInput(attrs={'class':'form-control'}),
             'fullname': forms.TextInput(attrs={'class':'form-control'}),
             'email': forms.EmailInput(attrs={'class':'form-control'}),

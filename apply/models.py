@@ -46,7 +46,7 @@ class Student(models.Model):
     email = models.EmailField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
     phone = models.CharField(max_length=20, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
+    course = models.ManyToManyField(Course, blank=True, related_name='students')
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True)
