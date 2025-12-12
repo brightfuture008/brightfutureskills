@@ -26,7 +26,7 @@ def profile_redirect_view(request):
     """
     return redirect('apply:home')
 
-def logout_redirect_view(request):
+def logout(request):
     """
     Redirects from the default /accounts/logout/ to the project's home page after logout.
     """
