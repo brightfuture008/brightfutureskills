@@ -27,9 +27,9 @@
       <li><a href="{% url 'applications:course_list' %}">Courses</a></li>
       <li><a href="#contact">Contact</a></li>
       {% if user.is_authenticated %}
-        <li><a href="{% url 'applications:logout' %}" class="btn-logout">Logout</a></li>
+        <li><a href="{% url 'logout' %}" class="btn-logout">Logout</a></li>
       {% else %}
-        <li><a href="{% url 'applications:login' %}" class="btn-login">Login</a></li>
+        <li><a href="{% url 'login' %}" class="btn-login">Login</a></li>
       {% endif %}
     </ul>
   </nav>
