@@ -27,7 +27,12 @@
       <li><a href="{% url 'apply:course_list' %}">Courses</a></li>
       <li><a href="#contact">Contact</a></li>
       {% if user.is_authenticated %}
-        <li><a href="{% url 'users:logout' %}" class="btn-logout">Logout</a></li>
+        <li>
+          <form id="logout-form" action="{% url 'users:logout' %}" method="post" style="display: none;">
+              {% csrf_token %}
+          </form>
+          <a href="#" onclick="document.getElementById('logout-form').submit(); return false;" class="btn-logout">Logout</a>
+        </li>
       {% else %}
         <li><a href="{% url 'users:login' %}" class="btn-login">Login</a></li>
       {% endif %}

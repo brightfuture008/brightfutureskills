@@ -36,19 +36,11 @@
     <div class="address-row">
       <div class="address-col">
         <label for="id_region">Region</label>
-        <select id="id_region" name="region" class="form-select cascade-region"
-                data-url-template="{% url 'apply:ajax_districts' 0 %}">
-          <option value="">Choose region</option>
-          {% for r in regions %}
-            <option value="{{ r.id }}">{{ r.name }}</option>
-          {% endfor %}
-        </select>
+        {{ form.region }}
       </div>
       <div class="address-col">
         <label for="id_district">District</label>
-        <select id="id_district" name="district" class="form-select cascade-district">
-          <option value="">First select region</option>
-        </select>
+        {{ form.district }}
       </div>
     </div>
 
@@ -61,7 +53,7 @@
 <script>
 $(document).ready(function(){
   // For cascading districts
-  const tpl = $('#id_region').data('url-template'); // e.g. /ajax/districts/0/
+  const tpl = "{% url 'apply:ajax_districts' 0 %}";
   $('#id_region').on('change', function(){
     const regionId = $(this).val();
     const $district = $('#id_district');

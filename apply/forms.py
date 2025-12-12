@@ -1,5 +1,6 @@
 from django import forms
 from .models import Student, Course, Region, District, Session
+from django.forms.widgets import Select
 
 class StudentForm(forms.ModelForm):
     class Meta:
@@ -15,6 +16,10 @@ class StudentForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class':'form-control'}),
             'session': forms.Select(attrs={'class':'form-select'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['district'].queryset = District.objects.none()
 
 class CourseForm(forms.ModelForm):
     class Meta:
