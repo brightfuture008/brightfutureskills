@@ -20,7 +20,6 @@
             <p style="color: #eee;"><strong>Full Name:</strong> {{ student.fullname }}</p>
             <p style="color: #eee;"><strong>Email:</strong> {{ student.email }}</p>
             <p style="color: #eee;"><strong>Phone:</strong> {{ student.phone }}</p>
-            <p style="color: #eee;"><strong>Course:</strong> {{ student.course.title }}</p>
             <p style="color: #eee;"><strong>Course(s):</strong></p>
             <ul>
               {% for course in student.course.all %}
