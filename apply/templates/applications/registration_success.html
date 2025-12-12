@@ -21,6 +21,14 @@
             <p style="color: #eee;"><strong>Email:</strong> {{ student.email }}</p>
             <p style="color: #eee;"><strong>Phone:</strong> {{ student.phone }}</p>
             <p style="color: #eee;"><strong>Course:</strong> {{ student.course.title }}</p>
+            <p style="color: #eee;"><strong>Course(s):</strong></p>
+            <ul>
+              {% for course in student.course.all %}
+                <li style="color: #eee;">{{ course.title }}</li>
+              {% empty %}
+                <li style="color: #eee;">No courses selected.</li>
+              {% endfor %}
+            </ul>
             <p style="color: #eee;"><strong>Region:</strong> {{ student.region.name }}</p>
             <p style="color: #eee;"><strong>District:</strong> {{ student.district.name }}</p>
             {% if student.session %}<p><strong>Session:</strong> {{ student.session.name }}</p>{% endif %}
