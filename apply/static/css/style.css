@@ -678,7 +678,7 @@ footer a:hover {
     color: var(--color-white);
     border: none;
     border-radius: 50%;
-    padding: 1%;
+    padding: 2%;
     font-size: 24px;
     font-weight: 900;
     cursor: pointer;
