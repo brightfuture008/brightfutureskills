@@ -1,14 +1,14 @@
 {% extends "applications/base.html" %}
 
-{% block title %}
-    add course
-{% endblock %}
+{% block title %}Add New Course{% endblock %}
 
 {% block content %}
-    <h2>Add New Course</h2>
-    <form method="post">
+<section class="container my-5">
+    <h2 class="mb-4">Add a New Course</h2>
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Add Course</button>
+        <button type="submit" class="btn btn-primary mt-3">Save Course</button>
     </form>
-{% endblock content %}
+</section>
+{% endblock %}

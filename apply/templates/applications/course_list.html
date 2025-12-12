@@ -1,29 +1,33 @@
 {% extends "applications/base.html" %}
+{% load static %}
 
-{% block title %}
-  Available Courses
-{% endblock %}
+{% block title %}Available Courses{% endblock %}
 
 {% block content %}
-  <main class="container my-5">
-    <section class="course-list">
-      <h2 class="section-title">All Available Courses</h2>
-      <div class="row g-4">
-        {% for course in courses %}
-        <div class="col-lg-4 col-md-6">
-          <div class="course-card-wrapper fade-in">
-            <div class="course-card">
-              <h3 class="card-title">{{ course.title }}</h3>
-              <p class="small muted">{{ course.course_id }} • {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
-              <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
-              <a href="{% url 'apply:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
+<main>
+    <section class="course-list container my-5">
+        <h2 class="section-title">All Available Courses</h2>
+        <div class="row g-4">
+            {% for course in courses %}
+            <div class="col-lg-4 col-md-6">
+                <div class="course-card-wrapper">
+                    <div class="course-card">
+                        {% if course.image %}
+                            <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
+                        {% else %}
+                            <img src="{% static 'images/back.webp' %}" class="card-img-top" alt="Default course image">
+                        {% endif %}
+                        <h3 class="card-title">{{ course.title }}</h3>
+                        <p class="small muted">{{ course.course_id }} • {{ course.duration_months }} month{{ course.duration_months|pluralize }}</p>
+                        <p class="course-cost">Tsh {{ course.cost|floatformat:2 }}</p>
+                        <a href="{% url 'apply:course_detail' course.id %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
+                    </div>
+                </div>
             </div>
-          </div>
+            {% empty %}
+            <p class="text-center">No courses available at the moment.</p>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col"><p class="text-center">No courses available at the moment.</p></div>
-        {% endfor %}
-      </div>
     </section>
-  </main>
+</main>
 {% endblock %}

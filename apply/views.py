@@ -8,16 +8,8 @@ from .forms import StudentForm, CourseForm
 
 def home(request):
     """
-    Renders the home page. If the user is logged in and has a student profile,
-    it redirects them to their profile page.
+    Renders the home page for all users.
     """
-    if request.user.is_authenticated:
-        # Check if a student profile exists for the logged-in user
-        student = Student.objects.filter(user=request.user).first()
-        if student:
-            # Redirect to the student's success/details page
-            return redirect('apply:student_profile')
-            
     all_courses = Course.objects.all()
     return render(request, 'applications/home.html', {'courses': all_courses})
 
@@ -46,6 +38,8 @@ def add_student(request):
             student = form.save(commit=False)
             student.user = request.user  # Link the student to the logged-in user
             student.save()
+            # This is crucial for saving ManyToMany fields like 'course'
+            form.save_m2m()
             return redirect('apply:student_profile')
     else:
         initial_data = {}
@@ -62,7 +56,7 @@ def add_student(request):
 
 def add_course(request):
     if request.method == 'POST':
-        form = CourseForm(request.POST)
+        form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('apply:course_list')
@@ -81,11 +75,11 @@ def course_detail(request, course_id):
 @login_required
 def student_profile(request):
     """
-    Displays the registered student's information.
-    This view renders the 'registration_success.html' template.
+    Displays the registered student's profile/details page.
+    This view now renders the 'student_detail.html' template for a complete summary.
     """
     student = get_object_or_404(Student, user=request.user)
-    return render(request, 'applications/registration_success.html', {'student': student})
+    return render(request, 'applications/student_detail.html', {'student': student})
 
 def enroll_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
