@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('apply.urls')),
 ]
 
-# Serve media files during development
-# This is crucial for serving user-uploaded files (like course images) in development
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files ONLY during development
+if settings.DEBUG:
+    # This is crucial for serving user-uploaded files (like course images) in development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
