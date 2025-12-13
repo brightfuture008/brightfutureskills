@@ -5,7 +5,8 @@ from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.urls import reverse
-from .models import Student, Course, Region, District, Session, Enrollment
+from .models import Student, Course, Region, District, Session, Enrollment, User
+from users.models import Profile
 from .forms import StudentForm, CourseForm
 
 def home(request):
@@ -24,104 +25,104 @@ def course_list(request):
     return render(request, 'applications/course_list.html', {'courses': all_courses})
 
 @login_required
-def add_student(request):
+def application_start(request):
     """
-    Handles student application form for logged-in users.
-    If a logged-in user already has a student profile, it redirects them.
+    Redirects user to the correct step in the application process.
     """
     if hasattr(request.user, 'student'):
-        # User is already registered as a student, show the 'already_registered' page
-        profile_url = reverse('apply:student_profile')
-        return render(request, 'applications/already_registered.html', {'profile_url': profile_url})
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        if profile.payment_status == Profile.PaymentStatus.APPROVED:
+            return redirect('apply:course_request')
+        else:
+            return redirect('apply:payment')
+    return redirect('apply:personal_info')
+
+@login_required
+def personal_info_view(request):
+    """
+    Step 1: Collect personal information.
+    """
+    # Get existing student instance if it exists, otherwise None.
+    student_instance = getattr(request.user, 'student', None)
 
     if request.method == 'POST':
-        form = StudentForm(request.POST)
-        course1_id = request.POST.get('course1')
-        session1_id = request.POST.get('session1')
-
-        if form.is_valid() and course1_id and session1_id:
-            # Data is valid, store it in the session and redirect to confirmation page
-            request.session['student_application_data'] = request.POST.copy()
-            return redirect('apply:confirm_student_application')
-        else:
-            # Add a custom error if the first course/session is not selected
-            if not course1_id or not session1_id:
-                messages.error(request, 'Please select both a course and a session for your first choice.')
-            elif not form.is_valid():
-                messages.error(request, 'Please correct the errors below and try again.')
-            # The form will re-render with existing errors
+        # Pass instance to the form to handle both creation and update.
+        form = StudentForm(request.POST, instance=student_instance)
+        if form.is_valid():
+            student = form.save(commit=False)
+            student.user = request.user
+            student.save()
+            messages.success(request, 'Personal information has been saved successfully.')
+            return redirect('apply:payment')
     else:
-        form = StudentForm()
+        # For a GET request, pre-populate the form if the student exists.
+        form = StudentForm(instance=student_instance)
     
     regions = Region.objects.all()
-    courses = Course.objects.all()
-    sessions = Session.objects.all()
-
-    return render(request, 'applications/add_student.html', {
+    return render(request, 'applications/personal_info.html', {
         'form': form,
         'regions': regions,
-        'courses': courses,
-        'sessions': sessions,
+        'step': 'personal_info',
     })
 
 @login_required
-def confirm_student_application(request):
+def payment_view(request):
     """
-    Step 2 of Student Application: Display data for confirmation and handle final submission.
+    Step 2: Display payment instructions.
     """
-    application_data = request.session.get('student_application_data')
+    if not hasattr(request.user, 'student'):
+        messages.info(request, 'Please fill in your personal information first.')
+        return redirect('apply:personal_info')
+    
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    if profile.payment_status == Profile.PaymentStatus.APPROVED:
+        return redirect('apply:course_request')
 
-    if not application_data:
-        messages.error(request, 'Your session has expired. Please start the application again.')
-        return redirect('apply:add_student')
+    return render(request, 'applications/payment_instructions.html', {'step': 'payment'})
+
+@login_required
+def course_request_view(request):
+    """
+    Step 3: Select courses after payment approval.
+    """
+    if not hasattr(request.user, 'student'):
+        messages.info(request, 'Please fill in your personal information first.')
+        return redirect('apply:personal_info')
+
+    # Get or create the profile to handle users created before the signal.
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    # Check for payment approval
+    if not request.user.is_staff and profile.payment_status != Profile.PaymentStatus.APPROVED:
+        messages.warning(request, 'Your payment has not been approved yet.')
+        return redirect('apply:payment')
 
     if request.method == 'POST':
-        # User has confirmed, now we save the data
-        form = StudentForm(application_data)
-        if form.is_valid():
+        course1_id = request.POST.get('course1')
+        session1_id = request.POST.get('session1')
+        course2_id = request.POST.get('course2')
+        session2_id = request.POST.get('session2')
+
+        if course1_id and session1_id:
             with transaction.atomic():
-                student = form.save(commit=False)
-                student.user = request.user
-                student.save()
-
-                # Process first course enrollment
-                course1_id = application_data.get('course1')
-                session1_id = application_data.get('session1')
-                if course1_id and session1_id:
-                    Enrollment.objects.create(student=student, course_id=course1_id, session_id=session1_id)
-
-                # Process second course enrollment
-                course2_id = application_data.get('course2')
-                session2_id = application_data.get('session2')
+                student = request.user.student
+                # Clear previous enrollments to allow changes
+                student.enrollments.all().delete()
+                Enrollment.objects.create(student=student, course_id=course1_id, session_id=session1_id)
                 if course2_id and session2_id:
                     Enrollment.objects.create(student=student, course_id=course2_id, session_id=session2_id)
-
-            # Clean up the session
-            del request.session['student_application_data']
-            
+            messages.success(request, 'Your course selection has been submitted successfully!')
             return redirect('apply:student_profile')
         else:
-            # This should ideally not happen if data was valid before
-            messages.error(request, 'An unexpected error occurred. Please try again.')
-            return redirect('apply:add_student')
+            messages.error(request, 'Please select at least the first course and session.')
 
-    # Safely get related objects for display
-    district_id = application_data.get('district')
-    course2_id = application_data.get('course2')
-    session2_id = application_data.get('session2')
-
-    # Prepare context for the confirmation template
-    context = {
-        'data': application_data,
-        'course1': Course.objects.get(id=application_data.get('course1')),
-        'session1': Session.objects.get(id=application_data.get('session1')),
-        'region': Region.objects.get(id=application_data.get('region')),
-        # Only fetch objects if the ID exists
-        'district': District.objects.get(id=district_id) if district_id else None,
-        'course2': Course.objects.get(id=course2_id) if course2_id else None,
-        'session2': Session.objects.get(id=session2_id) if session2_id else None,
-    }
-    return render(request, 'applications/confirm_application.html', context)
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    return render(request, 'applications/course_request.html', {
+        'courses': courses,
+        'sessions': sessions,
+        'step': 'course_request',
+    })
 
 def add_course(request):
     if request.method == 'POST':
@@ -140,6 +141,46 @@ def student_detail(request, student_id):
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     return render(request, 'applications/course_detail.html', {'course': course})
+
+@login_required
+def payment_instructions(request):
+    """
+    DEPRECATED: Logic is now in payment_view.
+    """
+    return redirect('apply:payment')
+
+@login_required
+def approve_payments_list(request):
+    """
+    Admin view to see users who are pending payment approval or are unpaid.
+    """
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('apply:home')
+    
+    pending_users = User.objects.filter(profile__payment_status=Profile.PaymentStatus.PENDING).select_related('profile')
+    return render(request, 'applications/admin_approve_payments.html', {'users': pending_users})
+
+@login_required
+def mark_as_paid(request):
+    """
+    Allows a user to mark their payment as 'Pending' for admin review.
+    """
+    if request.method == 'POST':
+        # Use get_or_create to prevent errors for users without a profile (e.g., superuser)
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        profile.payment_status = Profile.PaymentStatus.PENDING
+        profile.save()
+        messages.success(request, "Thank you! The admin has been notified. Your payment will be reviewed shortly.")
+    return redirect('apply:payment_instructions')
+
+@login_required
+def approve_user_payment(request, user_id):
+    user_to_approve = get_object_or_404(User, id=user_id)
+    user_to_approve.profile.payment_status = Profile.PaymentStatus.APPROVED
+    user_to_approve.profile.save()
+    messages.success(request, f"Payment for {user_to_approve.username} has been approved.")
+    return redirect('apply:approve_payments_list')
 
 @login_required
 def student_profile(request):

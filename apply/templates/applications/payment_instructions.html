@@ -1,0 +1,48 @@
+{% extends "applications/application_base.html" %}
+
+{% block title %}Payment Instructions{% endblock %}
+
+{% block application_content %}
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="payment-header">
+            <i class="bi bi-shield-lock-fill payment-icon"></i>
+            <h2>Secure Application Fee</h2>
+            <p>Complete this final step to unlock course selection.</p>
+        </div>
+
+        <div class="payment-amount">
+            <span class="currency">Tsh</span>
+            <span class="amount-value">5,000</span>
+        </div>
+
+        <div class="payment-instructions">
+            <h4>How to Pay:</h4>
+            <ol class="instruction-list">
+                <li>Send the fee via Mobile Money to: <strong class="phone-number">+255 775 595 959</strong></li>
+                <li>Send a WhatsApp message to the same number with your full name and transaction ID.</li>
+            </ol>
+        </div>
+
+        {% if messages %}
+        <div class="payment-messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="payment-action">
+        {% if user.profile.payment_status == 'PENDING' %}
+            <button class="btn-submit-payment" disabled>Approval is Pending</button>
+            <p class="status-note">You have already notified the admin. Please wait for approval.</p>
+        {% else %}
+            <form method="post" action="{% url 'apply:mark_as_paid' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-submit-payment">I Have Paid & Notified Admin</button>
+            </form>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

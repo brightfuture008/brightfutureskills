@@ -5,13 +5,15 @@ from django.forms.widgets import Select
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['fullname','email','gender','phone','region','district']
+        fields = ['first_name', 'middle_name', 'last_name', 'email', 'gender', 'phone', 'region', 'district']
         widgets = {
             'gender': forms.Select(attrs={'class':'form-select'}),
             'region': forms.Select(attrs={'class': 'form-select cascade-region'}),
             'district': forms.Select(attrs={'class': 'form-select cascade-district'}),
             'phone': forms.TextInput(attrs={'class':'form-control'}),
-            'fullname': forms.TextInput(attrs={'class':'form-control'}),
+            'first_name': forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Enter your first name'}),
+            'middle_name': forms.TextInput(attrs={'class':'form-control'}),
+            'last_name': forms.TextInput(attrs={'class':'form-control'}),
             'email': forms.EmailInput(attrs={'class':'form-control'}),
         }
     

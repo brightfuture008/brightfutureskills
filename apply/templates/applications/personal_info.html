@@ -1,0 +1,51 @@
+{% extends "applications/application_base.html" %}
+
+{% block title %}Step 1: Personal Information{% endblock %}
+
+{% block application_content %}
+<main>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <h2 class="section-title">Step 1: Personal Information</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="address-row">
+            <div class="address-col">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+            <div class="address-col">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+        </div>
+        <div class="address-row">
+            <div class="address-col">{{ form.middle_name.label_tag }} {{ form.middle_name }}</div>
+            <div class="address-col">{{ form.email.label_tag }} {{ form.email }}</div>
+        </div>
+        <div class="address-row">
+            <div class="address-col">{{ form.phone.label_tag }} {{ form.phone }}</div>
+            <div class="address-col">{{ form.gender.label_tag }} {{ form.gender }}</div>
+        </div>
+
+        <h5>Address Information</h5>
+        <div class="address-row">
+            <div class="address-col">
+                <label for="id_region">Region</label>
+                {{ form.region }}
+            </div>
+            <div class="address-col">
+                <label for="id_district">District</label>
+                {{ form.district }}
+            </div>
+        </div>
+
+        <button type="submit">Save & Proceed to Payment</button>
+    </form>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Your existing AJAX script for regions/districts can go here
+</script>
+{% endblock extra_js %}

@@ -58,7 +58,9 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     GENDER_CHOICES = (('M','Male'),('F','Female'))
     code = models.CharField(max_length=32, unique=True, editable=False)
-    fullname = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=100)
+    middle_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100)
     email = models.EmailField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
     phone = models.CharField(max_length=20, blank=True)
@@ -66,6 +68,10 @@ class Student(models.Model):
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def fullname(self):
+        return f"{self.first_name} {self.middle_name} {self.last_name}".strip()
 
     def save(self, *args, **kwargs):
         if not self.code:

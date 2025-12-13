@@ -1,0 +1,56 @@
+{% extends "applications/base.html" %}
+
+{% block title %}Course Selection{% endblock %}
+
+{% block content %}
+<main>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <h2 class="section-title">Step 2: Select Your Courses</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- First Course Choice -->
+        <h5>First Course Choice <span class="text-danger">*</span></h5>
+        <div class="address-row">
+            <div class="address-col">
+                <label for="course1">Course</label>
+                <select name="course1" id="course1" class="form-select" required>
+                    <option value="">-- Select a Course --</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="address-col">
+                <label for="session1">Session</label>
+                <select name="session1" id="session1" class="form-select" required>
+                    <option value="">-- Select a Session --</option>
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}">{{ session.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Second Course Choice -->
+        <h5 class="mt-4">Second Course Choice (Optional)</h5>
+        <div class="address-row">
+            <div class="address-col">
+                <label for="course2">Course</label>
+                <select name="course2" id="course2" class="form-select"></select>
+            </div>
+            <div class="address-col">
+                <label for="session2">Session</label>
+                <select name="session2" id="session2" class="form-select"></select>
+            </div>
+        </div>
+
+        <button type="submit">Submit Application</button>
+    </form>
+</main>
+{% endblock %}
