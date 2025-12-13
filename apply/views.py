@@ -47,6 +47,8 @@ def add_student(request):
             # Add a custom error if the first course/session is not selected
             if not course1_id or not session1_id:
                 messages.error(request, 'Please select both a course and a session for your first choice.')
+            elif not form.is_valid():
+                messages.error(request, 'Please correct the errors below and try again.')
             # The form will re-render with existing errors
     else:
         form = StudentForm()
