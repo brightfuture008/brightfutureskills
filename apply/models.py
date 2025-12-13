@@ -15,9 +15,13 @@ class Course(models.Model):
     title = models.CharField(max_length=200)
     lecturer = models.CharField(max_length=120, blank=True)
     duration_months = models.PositiveSmallIntegerField(default=1, help_text="Duration in months")    
-    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Cost per month")
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True, help_text="Upload a picture for the course.")
+
+    @property
+    def total_cost(self):
+        return self.cost * self.duration_months
 
     def __str__(self):
         if self.course_id:

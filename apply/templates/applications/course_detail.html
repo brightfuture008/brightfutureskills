@@ -14,7 +14,10 @@
             <div class="course-meta">
                 <span><i class="bi bi-journal-code"></i> Code: {{ course.course_id }}</span>
                 <span><i class="bi bi-clock"></i> Duration: {{ course.duration_months }} month{{ course.duration_months|pluralize }}</span>
-                <span><i class="bi bi-cash-coin"></i> Cost: Tsh {{ course.cost|floatformat:2 }}</span>
+                <span title="Cost per month">
+                    <i class="bi bi-cash-coin"></i> Cost: Tsh {{ course.cost|floatformat:2 }}/month
+                    (Total: Tsh {{ course.total_cost|floatformat:2 }})
+                </span>
             </div>
             <p class="course-description">{{ course.description|linebreaksbr|default:"No detailed description available for this course." }}</p>
             <div class="details-actions">
