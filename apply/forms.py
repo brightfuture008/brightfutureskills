@@ -24,7 +24,11 @@ class StudentForm(forms.ModelForm):
             self.fields['district'].queryset = District.objects.none()
 
         if 'region' in self.data:
-            self.fields['district'].queryset = District.objects.filter(region_id=self.data.get('region')).order_by('name')
+            try:
+                region_id = int(self.data.get('region'))
+                self.fields['district'].queryset = District.objects.filter(region_id=region_id).order_by('name')
+            except (ValueError, TypeError):
+                pass # If region is not a valid ID, do nothing and let the queryset remain empty.
 
 class CourseForm(forms.ModelForm):
     class Meta:

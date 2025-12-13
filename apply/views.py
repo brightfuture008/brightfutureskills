@@ -26,11 +26,7 @@ def course_list(request):
 @login_required
 def application_start(request):
     if hasattr(request.user, 'student'):
-        profile, _ = Profile.objects.get_or_create(user=request.user)
-        if profile.payment_status == Profile.PaymentStatus.APPROVED:
-            return redirect('apply:course_request')
-        else:
-            return redirect('apply:payment')
+        return render(request, 'applications/already_registered.html')
     return redirect('apply:personal_info')
 
 @login_required

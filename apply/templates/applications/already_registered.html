@@ -1,25 +1,19 @@
 {% extends "applications/base.html" %}
 
-{% block content %}
-<style>
-    .notice-container {
-        max-width: 600px;
-        margin: 4rem auto;
-        padding: 2rem;
-        text-align: center;
-        background: var(--color-card-bg);
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-    .notice-container h2 {
-        color: var(--color-primary-dark);
-    }
-</style>
+{% block title %}Application Submitted{% endblock %}
 
-<div class="container notice-container">
-    <h2>Already Registered</h2>
-    <p class="lead">The system shows you already have a profile at our institution.</p>
-    <p>You can view or edit your information by clicking the button below.</p>
-    <a href="{{ profile_url }}" class="btn btn-primary mt-3">View My Information</a>
+{% block content %}
+<div class="payment-success-container">
+    <div class="payment-success-card">
+        <div class="payment-success-icon">
+            <i class="bi bi-info-circle-fill"></i>
+        </div>
+        <h2>You Have Already Applied</h2>
+        <p class="lead">Your application has already been submitted. You can view your application details or proceed to the next steps if you haven't completed them.</p>
+        <hr>
+        <div class="details-actions mt-4">
+            <a href="{% url 'apply:student_profile' %}" class="btn btn-success">View My Application</a>
+        </div>
+    </div>
 </div>
-{% endblock content %}
+{% endblock %}
