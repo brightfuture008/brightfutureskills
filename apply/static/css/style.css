@@ -938,22 +938,10 @@ footer a:hover {
     border-top: 5px solid #2ecc71;
 }
 
-.payment-success-card h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-text-dark);
-    margin-bottom: 0.5rem;
-}
-
-.payment-success-card .lead {
-    color: #6c757d;
-    margin-bottom: 1.5rem;
-}
-
 .step-nav {
     display: flex;
     justify-content: center;
-    margin: 1rem auto 1rem auto; /* Reduced bottom margin */
+    margin: 1rem auto 1rem auto;
     padding: 0;
     list-style: none;
     border: 1px solid var(--glass-border);
@@ -961,7 +949,7 @@ footer a:hover {
     overflow: hidden;
     max-width: 600px;
     background: var(--glass-bg);
-    gap: 1rem; /* Increase distance between icons */
+    gap: 1rem;
 }
 .step-nav-item {
     flex: 1;
@@ -992,21 +980,4 @@ footer a:hover {
 .step-nav-link:not(.active):hover {
     background-color: hsla(0, 0%, 100%, 0.1);
     border-color: var(--glass-border);
-}
-.payment-success-icon {
-    font-size: 4rem;
-    color: #2ecc71;
-    margin-bottom: 1rem;
-}
-
-.payment-success-card h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-text-dark);
-    margin-bottom: 0.5rem;
-}
-
-.payment-success-card .lead {
-    color: #6c757d;
-    margin-bottom: 1.5rem;
 }

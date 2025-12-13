@@ -3,10 +3,12 @@
 {% block title %}Personal Information{% endblock %}
 
 {% block application_content %}
-<form method="post" novalidate 
-    id="personal-info-form"
-    data-districts-url-template="{% url 'apply:ajax_districts' 999 %}"
-    data-initial-district-id="{{ form.instance.district.id|default_if_none:'' }}"
+<form
+  method="post"
+  novalidate
+  id="personal-info-form"
+  data-districts-url-template="{% url 'apply:ajax_districts' 999 %}"
+  data-initial-district-id="{{ form.instance.district.id|default_if_none:'' }}"
 >
     {% csrf_token %}
     <h2>Personal Information</h2>

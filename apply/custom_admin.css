@@ -114,3 +114,25 @@ div.breadcrumbs {
 .admin-app-list .module .changelink:hover {
     text-decoration: underline;
 }
+
+/* Styles for admin_approve_payments.html */
+#changelist-pending { 
+    background: #fff8e1; /* Highlight pending section */
+}
+
+[data-theme="dark"] #changelist-pending { 
+    background: #4e4224; 
+}
+
+.changelist-filter-container {
+    margin-bottom: 1rem;
+}
+
+.search-bar-container {
+    display: flex;
+    gap: 6px;
+}
+
+.inline-form {
+    display: inline;
+}

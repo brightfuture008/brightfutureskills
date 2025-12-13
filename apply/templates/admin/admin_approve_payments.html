@@ -2,12 +2,8 @@
 {% load static %}
 
 {% block extrastyle %}
-    {{ block.super }}
+    {{ block.super }} {# This already loads custom_admin.css via base_site.html #}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/changelists.css' %}">
-    <style>
-        #changelist-pending { background: #fff8e1; } /* Highlight pending section */
-        [data-theme="dark"] #changelist-pending { background: #4e4224; }
-    </style>
 {% endblock %}
 
 {% block coltype %}colM{% endblock %}
@@ -22,10 +18,10 @@
     </ul>
     {% endif %}
 
-    <div id="changelist-filter" style="margin-bottom: 1rem;">
+    <div id="changelist-filter" class="changelist-filter-container">
         <h2>Search Users</h2>
         <form method="get" action="">
-            <div style="display: flex; gap: 6px;">
+            <div class="search-bar-container">
                 <input type="text" name="q" value="{{ search_query }}" placeholder="Search by username or email..." size="40">
                 <button type="submit">Search</button>
                 {% if search_query %}<a href="{% url 'admin:approve_payments_list' %}" class="button">Clear</a>{% endif %}
@@ -52,14 +48,14 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.date_joined|date:"Y-m-d" }}</td>
                         <td>
-                            <form method="post" action="{% url 'apply:approve_user_payment' user.id %}" style="display: inline;">
+                            <form method="post" action="{% url 'apply:approve_user_payment' user.id %}" class="inline-form">
                                 {% csrf_token %}
                                 <button type="submit" class="button">Approve</button>
                             </form>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
+                    <tr class="empty-row">
                         <td colspan="4" style="text-align: center;">No users are pending approval.</td>
                     </tr>
                     {% endfor %}
@@ -87,7 +83,7 @@
                         <td>{{ user.date_joined|date:"Y-m-d" }}</td>
                     </tr>
                     {% empty %}
-                    <tr>
+                    <tr class="empty-row">
                         <td colspan="3" style="text-align: center;">No users are currently unpaid.</td>
                     </tr>
                     {% endfor %}
