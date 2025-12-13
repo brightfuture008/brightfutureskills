@@ -1,0 +1,21 @@
+{% extends "applications/application_base.html" %}
+
+{% block title %}Payment Successful{% endblock %}
+
+{% block application_content %}
+<div class="payment-success-container">
+    <div class="payment-success-card">
+        <div class="payment-success-icon">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h2>Payment Confirmed!</h2>
+        <p class="lead">Your application fee has been successfully processed.</p>
+        <hr>
+        <p>Your Application ID is: <strong>{{ request.user.student.code }}</strong></p>
+        <p>You can now proceed to the final step to select your courses.</p>
+        <div class="details-actions mt-4">
+            <a href="{% url 'apply:course_request' %}" class="btn btn-success">Proceed to Course Selection</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

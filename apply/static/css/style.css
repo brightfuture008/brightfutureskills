@@ -147,6 +147,12 @@ main {
   outline: none;
 }
 
+.nav-links .btn-admin {
+  background-color: var(--color-accent-1) !important;
+  color: var(--color-text-dark) !important;
+  font-weight: 700;
+}
+
 @media (max-width: 768px) {
   .nav-links {
     gap: 8px;
@@ -900,4 +906,41 @@ footer a:hover {
     font-size: 0.9rem;
     color: #6c757d;
     margin-top: 0.75rem;
+}
+
+.payment-success-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+.payment-success-card {
+    width: 100%;
+    max-width: 550px;
+    background: var(--color-card-bg);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    border-top: 5px solid #2ecc71;
+}
+
+.payment-success-icon {
+    font-size: 4rem;
+    color: #2ecc71;
+    margin-bottom: 1rem;
+}
+
+.payment-success-card h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.payment-success-card .lead {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
 }

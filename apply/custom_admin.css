@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --admin-primary: #4a69bd;
+    --admin-secondary: #6a89cc;
+    --admin-bg: #f4f7f6;
+    --admin-card-bg: #ffffff;
+    --admin-text: #343a40;
+    --admin-header-bg: #3c0056;
+    --admin-header-text: #ffffff;
+    --admin-accent: #07ff6e;
+}
+
+body, #content {
+    font-family: 'Poppins', sans-serif;
+    background: var(--admin-bg);
+}
+
+#header {
+    background: var(--admin-header-bg);
+    color: var(--admin-header-text);
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: var(--admin-header-text);
+    font-weight: 700;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: var(--admin-secondary);
+    color: white;
+}
+
+div.breadcrumbs {
+    background: var(--admin-primary);
+    color: white;
+}
+
+.breadcrumbs a {
+    color: #e0e0e0;
+}
+
+/* Custom Dashboard Cards */
+.admin-app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.admin-app-list .module {
+    background: var(--admin-card-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.admin-app-list .module:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.admin-app-list .module caption {
+    background: var(--admin-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.admin-app-list .module caption a {
+    color: white;
+}
+
+.admin-app-list .module table {
+    width: 100%;
+}
+
+.admin-app-list .module th {
+    padding: 1rem;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.admin-app-list .module th a {
+    color: var(--admin-text);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-app-list .module th a::before {
+    font-family: "bootstrap-icons";
+    font-size: 1.2rem;
+    color: var(--admin-primary);
+}
+
+.admin-app-list .model-user th a::before { content: '\F4DA'; }
+.admin-app-list .model-student th a::before { content: '\F4D7'; }
+.admin-app-list .model-course th a::before { content: '\F1C1'; }
+.admin-app-list .model-session th a::before { content: '\F231'; }
+.admin-app-list .model-region th a::before { content: '\F3E4'; }
+.admin-app-list .model-district th a::before { content: '\F3E3'; }
+.admin-app-list .model-enrollment th a::before { content: '\F4F2'; }
+.admin-app-list .model-profile th a::before { content: '\F4E3'; }
+
+.admin-app-list .module .addlink,
+.admin-app-list .module .changelink {
+    color: var(--admin-primary);
+    font-weight: 600;
+}
+
+.admin-app-list .module .addlink:hover,
+.admin-app-list .module .changelink:hover {
+    text-decoration: underline;
+}

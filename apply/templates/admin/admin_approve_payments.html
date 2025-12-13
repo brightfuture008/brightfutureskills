@@ -1,0 +1,99 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/changelists.css' %}">
+    <style>
+        #changelist-pending { background: #fff8e1; } /* Highlight pending section */
+        [data-theme="dark"] #changelist-pending { background: #4e4224; }
+    </style>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Payment Management</h1>
+
+    {% if messages %}
+    <ul class="messagelist">
+        {% for message in messages %}<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+
+    <div id="changelist-filter" style="margin-bottom: 1rem;">
+        <h2>Search Users</h2>
+        <form method="get" action="">
+            <div style="display: flex; gap: 6px;">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by username or email..." size="40">
+                <button type="submit">Search</button>
+                {% if search_query %}<a href="{% url 'admin:approve_payments_list' %}" class="button">Clear</a>{% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="module" id="changelist-pending">
+        <h2>Pending Approval ({{ pending_users.count }})</h2>
+        <div class="results">
+            <table id="result_list">
+                <thead>
+                    <tr>
+                        <th scope="col" class="sortable column-username">Username</th>
+                        <th scope="col" class="sortable column-email">Email</th>
+                        <th scope="col" class="sortable column-date_joined">Date Joined</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in pending_users %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'apply:approve_user_payment' user.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="button">Approve</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No users are pending approval.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="module" id="changelist-unpaid">
+        <h2>Unpaid Users</h2>
+        <div class="results">
+            <table id="result_list_unpaid">
+                <thead>
+                    <tr>
+                        <th scope="col" class="sortable column-username">Username</th>
+                        <th scope="col" class="sortable column-email">Email</th>
+                        <th scope="col" class="sortable column-date_joined">Date Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in unpaid_users %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No users are currently unpaid.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

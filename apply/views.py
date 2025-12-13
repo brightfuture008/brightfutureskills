@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
-from django.db import transaction
+from django.db import transaction, models
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.core.mail import send_mail
 from django.urls import reverse
 from .models import Student, Course, Region, District, Session, Enrollment, User
 from users.models import Profile
@@ -61,7 +62,7 @@ def payment_view(request):
     
     profile, _ = Profile.objects.get_or_create(user=request.user)
     if profile.payment_status == Profile.PaymentStatus.APPROVED:
-        return redirect('apply:course_request')
+        return render(request, 'applications/payment_success.html', {'step': 'payment'})
 
     return render(request, 'applications/payment_instructions.html', {'step': 'payment'})
 
@@ -131,8 +132,24 @@ def approve_payments_list(request):
         messages.error(request, "You do not have permission to access this page.")
         return redirect('apply:home')
     
+    query = request.GET.get('q')
+
     pending_users = User.objects.filter(profile__payment_status=Profile.PaymentStatus.PENDING).select_related('profile')
-    return render(request, 'applications/admin_approve_payments.html', {'users': pending_users})
+    unpaid_users = User.objects.filter(profile__payment_status=Profile.PaymentStatus.UNPAID).select_related('profile')
+
+    if query:
+        pending_users = pending_users.filter(
+            models.Q(username__icontains=query) | models.Q(email__icontains=query)
+        )
+        unpaid_users = unpaid_users.filter(
+            models.Q(username__icontains=query) | models.Q(email__icontains=query)
+        )
+
+    return render(request, 'admin/admin_approve_payments.html', {
+        'pending_users': pending_users,
+        'unpaid_users': unpaid_users,
+        'search_query': query or '',
+    })
 
 @login_required
 def mark_as_paid(request):
@@ -140,6 +157,27 @@ def mark_as_paid(request):
         profile, created = Profile.objects.get_or_create(user=request.user)
         profile.payment_status = Profile.PaymentStatus.PENDING
         profile.save()
+
+        # Tuma barua pepe kwa admin
+        subject = f"New Payment Notification: {request.user.username}"
+        message = f"""
+        Hello Admin,
+
+        A user has marked their payment as complete and is awaiting your approval.
+
+        Username: {request.user.username}
+        Email: {request.user.email}
+
+        Please log in to the admin panel to review and approve the payment.
+        """
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=None,  # It will use DEFAULT_FROM_EMAIL from settings
+            recipient_list=[admin_email for _, admin_email in settings.ADMINS],
+            fail_silently=False, # Set to True in production if you don't want errors to stop the process
+        )
+
         messages.success(request, "Thank you! The admin has been notified. Your payment will be reviewed shortly.")
     return redirect('apply:payment_instructions')
 

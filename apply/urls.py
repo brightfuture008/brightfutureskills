@@ -23,6 +23,6 @@ urlpatterns = [
     # Payment flow URLs
     path('payment-instructions/', views.payment_instructions, name='payment_instructions'),
     path('mark-as-paid/', views.mark_as_paid, name='mark_as_paid'),
-    path('admin/approve-payments/', views.approve_payments_list, name='approve_payments_list'),
-    path('admin/approve/<int:user_id>/', views.approve_user_payment, name='approve_user_payment'),
+    path('manage/approve-payments/', views.approve_payments_list, name='approve_payments_list'),
+    path('manage/approve/<int:user_id>/', views.approve_user_payment, name='approve_user_payment'),
 ]

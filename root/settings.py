@@ -9,6 +9,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost','.pythonanywhere.com']
 
+# Admin Information for Notifications
+ADMINS = [('Admin Name', 'admin@example.com')] # MUHIMU: Badilisha na jina na email yako halisi
+
+# Email Configuration
+# Kwa sasa, barua pepe zitaonyeshwa kwenye console unapoendesha server.
+# Kwenye production (PythonAnywhere), utahitaji kuweka mipangilio ya SMTP.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+
 
 
 INSTALLED_APPS = [

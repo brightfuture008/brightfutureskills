@@ -42,11 +42,21 @@
         <div class="address-row">
             <div class="address-col">
                 <label for="course2">Course</label>
-                <select name="course2" id="course2" class="form-select"></select>
+                <select name="course2" id="course2" class="form-select">
+                    <option value="">-- Select a Course (Optional) --</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.title }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="address-col">
                 <label for="session2">Session</label>
-                <select name="session2" id="session2" class="form-select"></select>
+                <select name="session2" id="session2" class="form-select">
+                    <option value="">-- Select a Session (Optional) --</option>
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}">{{ session.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
