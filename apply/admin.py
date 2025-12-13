@@ -22,9 +22,9 @@ class CustomAdminSite(admin.AdminSite):
         urls = super().get_urls()
         custom_urls = [
             path(
-                'approve-payments/',
+                'payments/',
                 self.admin_view(approve_payments_list),
-                name='approve_payments_list'
+                name='payments_list'
             ),
         ]
         return custom_urls + urls

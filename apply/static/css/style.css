@@ -981,3 +981,127 @@ footer a:hover {
     background-color: hsla(0, 0%, 100%, 0.1);
     border-color: var(--glass-border);
 }
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 2;
+}
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.number-copy-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-grow: 1;
+}
+
+.btn-copy {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto; /* Pushes the button to the right */
+}
+
+.btn-copy:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-white);
+}
+
+.method-details {
+    text-align: left;
+}
+
+.method-details p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.method-card {
+    border-radius: 12px;
+    padding: 1rem;
+    border: 2px solid transparent;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.method-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.method-card.tigo {
+    background-color: #e0f7fa; /* Light Cyan/Blue */
+    border-color: #3bc500; /* Bright Blue */
+    animation-delay: 0.2s;
+}
+
+.method-card.halotel {
+    background-color: #fff1f2; /* Light Red */
+    border-color: #8b5800; /* Bright Red */
+    animation-delay: 0.4s;
+}
+
+.method-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.payment-number, .payment-name {
+    font-weight: 600;
+    color: var(--color-text-dark);
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.method-card.tigo .payment-number {
+    color: #00559F; /* Official Tigo Blue */
+}
+
+.method-card.halotel .payment-number {
+    color: #ED1C24; /* Official Halotel Red */
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 420px) {
+    .payment-card {
+        padding: 1.5rem;
+    }
+}

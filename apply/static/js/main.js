@@ -66,6 +66,47 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Password visibility toggle
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.password-toggle-icon').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('bi-eye-fill');
+                this.classList.add('bi-eye-slash-fill');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('bi-eye-slash-fill');
+                this.classList.add('bi-eye-fill');
+            }
+        });
+    });
+});
+
+// Copy to clipboard functionality for payment numbers
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-copy').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetSelector = this.dataset.copyTarget;
+            const targetElement = document.querySelector(targetSelector);
+            if (targetElement) {
+                navigator.clipboard.writeText(targetElement.innerText).then(() => {
+                    const originalText = this.innerText;
+                    this.innerText = 'Copied!';
+                    this.style.backgroundColor = '#2ecc71'; // Success color
+                    this.style.color = 'white';
+                    setTimeout(() => {
+                        this.innerText = originalText;
+                        this.style.backgroundColor = ''; // Revert to original
+                        this.style.color = '';
+                    }, 2000);
+                });
+            }
+        });
+    });
+});
+
 // Logout confirmation
 function confirmLogout(event) {
     event.preventDefault();

@@ -1,4 +1,5 @@
 {% extends "applications/application_base.html" %}
+{% load static %}
 
 {% block title %}Payment Instructions{% endblock %}
 
@@ -6,42 +7,74 @@
 <div class="payment-container">
     <div class="payment-card">
         <div class="payment-header">
-            <i class="bi bi-shield-lock-fill payment-icon"></i>
-            <h2>Secure Application Fee</h2>
-            <p>Complete this final step to unlock course selection.</p>
+            <div class="payment-icon">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <h2>Application Fee Payment</h2>
+            <p>Follow the steps below to complete your application.</p>
         </div>
 
         <div class="payment-amount">
-            <span class="currency">Tsh</span>
+            <span class="currency">TSh</span>
             <span class="amount-value">5,000</span>
         </div>
 
         <div class="payment-instructions">
-            <h4>How to Pay:</h4>
+            <h4><i class="bi bi-list-ol"></i> Payment Steps:</h4>
             <ol class="instruction-list">
-                <li>Send the fee via Mobile Money to: <strong class="phone-number">+255 775 595 959</strong></li>
-                <li>Send a WhatsApp message to the same number with your full name and transaction ID.</li>
+                <li>
+                    Send the application fee to one of the numbers below.
+                </li>
+                <li>
+                    After payment, send your <strong>Full Name</strong> and a <strong>screenshot of the transaction receipt</strong> via WhatsApp to the admin at <strong class="phone-number">0777024206</strong>.
+                </li>
+                <li>
+                    Finally, click the button below to notify us that you have completed the payment.
+                </li>
             </ol>
         </div>
 
-        {% if messages %}
-        <div class="payment-messages">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
+        <div class="payment-methods">
+            <div class="method-card tigo">
+                <div class="method-header">
+                    <span>Tigo Pesa / Mixx by Yas</span>
+                </div>
+                <div class="method-details">
+                    <div class="detail-item">
+                        <p><strong>Number</strong></p>
+                        <div class="number-copy-wrapper">
+                            <span class="payment-number" id="tigo-number">0777024206</span>
+                            <button type="button" class="btn-copy" data-copy-target="#tigo-number">Copy</button>
+                        </div>
+                    </div>
+                    <p><strong>Name:</strong> <span class="payment-name">Ayoub Yussuf Ayoub</span></p>
+                </div>
+            </div>
+            <div class="method-card halotel">
+                <div class="method-header">
+                    <span>Halotel</span>
+                </div>
+                <div class="method-details">
+                    <div class="detail-item">
+                        <p><strong>Number</strong></p>
+                        <div class="number-copy-wrapper">
+                            <span class="payment-number" id="halotel-number">0620629107</span>
+                            <button type="button" class="btn-copy" data-copy-target="#halotel-number">Copy</button>
+                        </div>
+                    </div>
+                    <p><strong>Name:</strong> <span class="payment-name">Ayoub Ayoub</span></p>
+                </div>
+            </div>
         </div>
-        {% endif %}
 
         <div class="payment-action">
-        {% if user.profile.payment_status == 'PENDING' %}
-            <button class="btn-submit-payment" disabled>Approval is Pending</button>
-            <p class="status-note">You have already notified the admin. Please wait for approval.</p>
-        {% else %}
-            <form method="post" action="{% url 'apply:mark_as_paid' %}">
+            <form action="{% url 'apply:mark_as_paid' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn-submit-payment">I Have Paid & Notified Admin</button>
+                <button type="submit" class="btn btn-submit-payment">
+                    <i class="bi bi-check-circle-fill"></i> I Have Completed The Payment
+                </button>
             </form>
-        {% endif %}
+            <p class="status-note">After clicking, your payment status will be 'Pending' until approved by the admin.</p>
         </div>
     </div>
 </div>

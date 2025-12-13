@@ -1,29 +1,32 @@
 {% extends "applications/base.html" %}
 
+{% block title %}Log In{% endblock %}
+
 {% block content %}
-<div class="container my-5">
-    <form method="post" class="fade-in is-visible">
-        {% csrf_token %}
-        <h2 class="section-title">Login</h2>
+<form method="post" novalidate>
+    {% csrf_token %}
+    <h2>Log In</h2>
 
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                Your username and password didn't match. Please try again.
-            </div>
-        {% endif %}
-
-        <div class="mb-3">
-            <label for="id_username" class="form-label">Username</label>
-            <input type="text" name="username" id="id_username" class="form-control" required>
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Your username and password didn't match. Please try again.</p>
         </div>
+    {% endif %}
 
-        <div class="mb-3">
-            <label for="id_password" class="form-label">Password</label>
-            <input type="password" name="password" id="id_password" class="form-control" required>
+    <div class="address-col">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+    </div>
+
+    <div class="address-col">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        <div class="password-wrapper">
+            {{ form.password }}
+            <i class="bi bi-eye-fill password-toggle-icon"></i>
         </div>
+    </div>
 
-        <button type="submit" class="btn btn-primary w-100">Login</button>
-        <p class="text-center mt-3">Don't have an account? <a href="{% url 'users:signup' %}">Sign up</a></p>
-    </form>
-</div>
+    <button type="submit" class="btn">Log In</button>
+    <p class="text-center mt-3">Don't have an account? <a href="{% url 'users:signup' %}">Sign Up</a></p>
+</form>
 {% endblock %}
