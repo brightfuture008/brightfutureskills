@@ -124,7 +124,7 @@ main {
   margin: 0;
   padding: 0;
   list-style: none;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   font-size: 0.8rem; 
 }
 
