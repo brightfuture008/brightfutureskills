@@ -14,7 +14,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Log the user in automatically
-            return redirect('apply:add_student') # Redirect to the application form
+            return redirect('apply:application_start') # Redirect to the application form
     else:
         form = UserCreationForm()
     
