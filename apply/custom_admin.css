@@ -136,3 +136,7 @@ div.breadcrumbs {
 .inline-form {
     display: inline;
 }
+
+.text-center {
+    text-align: center;
+}
