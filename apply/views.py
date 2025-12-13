@@ -105,15 +105,21 @@ def confirm_student_application(request):
             messages.error(request, 'An unexpected error occurred. Please try again.')
             return redirect('apply:add_student')
 
+    # Safely get related objects for display
+    district_id = application_data.get('district')
+    course2_id = application_data.get('course2')
+    session2_id = application_data.get('session2')
+
     # Prepare context for the confirmation template
     context = {
         'data': application_data,
         'course1': Course.objects.get(id=application_data.get('course1')),
         'session1': Session.objects.get(id=application_data.get('session1')),
-        'course2': Course.objects.get(id=application_data.get('course2')) if application_data.get('course2') else None,
-        'session2': Session.objects.get(id=application_data.get('session2')) if application_data.get('session2') else None,
         'region': Region.objects.get(id=application_data.get('region')),
-        'district': District.objects.get(id=application_data.get('district')),
+        # Only fetch objects if the ID exists
+        'district': District.objects.get(id=district_id) if district_id else None,
+        'course2': Course.objects.get(id=course2_id) if course2_id else None,
+        'session2': Session.objects.get(id=session2_id) if session2_id else None,
     }
     return render(request, 'applications/confirm_application.html', context)
 
