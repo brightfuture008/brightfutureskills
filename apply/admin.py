@@ -44,10 +44,20 @@ class UserAdmin(BaseUserAdmin):
     def get_payment_status(self, obj):
         return obj.profile.get_payment_status_display()
 
+class EnrollmentInline(admin.TabularInline):
+    model = Enrollment
+    extra = 0
+    verbose_name = "Course Enrollment"
+    verbose_name_plural = "Course Enrollments"
+    fields = ('course', 'session')
+    readonly_fields = ('course', 'session')
+    can_delete = False
+
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('fullname', 'code', 'email', 'region', 'created_at')
     list_filter = ('region', 'gender', 'created_at')
     search_fields = ('first_name', 'last_name', 'email', 'code')
+    inlines = [EnrollmentInline]
 
 admin_site = CustomAdminSite(name='custom_admin')
 
