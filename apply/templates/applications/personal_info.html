@@ -3,7 +3,11 @@
 {% block title %}Personal Information{% endblock %}
 
 {% block application_content %}
-<form method="post" novalidate>
+<form method="post" novalidate 
+    id="personal-info-form"
+    data-districts-url-template="{% url 'apply:ajax_districts' 999 %}"
+    data-initial-district-id="{{ form.instance.district.id|default_if_none:'' }}"
+>
     {% csrf_token %}
     <h2>Personal Information</h2>
 
@@ -30,50 +34,4 @@
 
     <button type="submit" class="btn">Save and Continue</button>
 </form>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const regionSelect = document.querySelector('.cascade-region');
-    const districtSelect = document.querySelector('.cascade-district');
-    const districtUrlTemplate = "{% url 'apply:ajax_districts' 999 %}"; // Use a placeholder
-
-    const updateDistricts = (isInitialLoad = false) => {
-        const regionId = regionSelect.value;
-        // Only use the initial district ID on the first load
-        const districtToSelect = isInitialLoad ? '{{ form.instance.district.id|default_if_none:"" }}' : null;
-        
-        if (regionId) {
-            districtSelect.disabled = true;
-            districtSelect.innerHTML = '<option value="">Loading...</option>';
-
-            fetch(districtUrlTemplate.replace('999', regionId)) // Replace placeholder with actual ID
-                .then(response => response.json())
-                .then(data => {
-                    districtSelect.innerHTML = '<option value="">---------</option>';
-                    data.districts.forEach(district => {
-                        const option = new Option(district.name, district.id);
-                        if (district.id == districtToSelect) {
-                            option.selected = true;
-                        }
-                        districtSelect.add(option);
-                    });
-                    districtSelect.disabled = false;
-                })
-                .catch(error => {
-                    console.error('Error fetching districts:', error);
-                    districtSelect.innerHTML = '<option value="">Error loading districts</option>';
-                    districtSelect.disabled = false;
-                });
-        } else {
-            districtSelect.innerHTML = '<option value="">---------</option>';
-        }
-    };
-
-    // When the region changes, call updateDistricts but not as initial load
-    regionSelect.addEventListener('change', () => updateDistricts(false));
-
-    // Run on page load and mark it as the initial one
-    updateDistricts(true);
-});
-</script>
 {% endblock %}

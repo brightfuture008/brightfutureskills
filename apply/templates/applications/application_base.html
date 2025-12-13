@@ -1,41 +1,16 @@
 {% extends "applications/base.html" %}
 
 {% block content %}
-<style>
-    .step-nav {
-        display: flex;
-        justify-content: center;
-        margin: 2rem auto;
-        padding: 0;
-        list-style: none;
-        border: 1px solid var(--glass-border);
-        border-radius: 12px;
-        overflow: hidden;
-        max-width: 600px;
-        background: var(--glass-bg);
-    }
-    .step-nav-item {
-        flex: 1;
-        text-align: center;
-    }
-    .step-nav-link {
-        display: block;
-        padding: 1rem 0.5rem;
-        color: var(--color-text-dark);
-        text-decoration: none;
-        font-weight: 600;
-        position: relative;
-    }
-    .step-nav-link.active {
-        background-color: var(--color-primary-dark);
-        color: var(--color-white);
-    }
-</style>
-
 <nav class="step-nav">
-    <li class="step-nav-item"><a href="{% url 'apply:personal_info' %}" class="step-nav-link {% if step == 'personal_info' %}active{% endif %}">1. Personal Info</a></li>
-    <li class="step-nav-item"><a href="{% url 'apply:payment' %}" class="step-nav-link {% if step == 'payment' %}active{% endif %}">2. Payment Section</a></li>
-    <li class="step-nav-item"><a href="{% url 'apply:course_request' %}" class="step-nav-link {% if step == 'course_request' %}active{% endif %}">3. Course Request</a></li>
+    <li class="step-nav-item">
+        <button onclick="window.location.href='{% url 'apply:personal_info' %}'" class="step-nav-link {% if step == 'personal_info' %}active{% endif %}" title="Personal Info"><i class="bi bi-person-fill"></i></button>
+    </li>
+    <li class="step-nav-item">
+        <button onclick="window.location.href='{% url 'apply:payment' %}'" class="step-nav-link {% if step == 'payment' %}active{% endif %}" title="Payment Section"><i class="bi bi-credit-card-fill"></i></button>
+    </li>
+    <li class="step-nav-item">
+        <button onclick="window.location.href='{% url 'apply:course_request' %}'" class="step-nav-link {% if step == 'course_request' %}active{% endif %}" title="Course Request"><i class="bi bi-journal-check"></i></button>
+    </li>
 </nav>
 
 {% block application_content %}{% endblock %}
