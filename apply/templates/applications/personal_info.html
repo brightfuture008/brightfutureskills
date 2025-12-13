@@ -1,49 +1,79 @@
 {% extends "applications/application_base.html" %}
 
-{% block title %}Step 1: Personal Information{% endblock %}
+{% block title %}Personal Information{% endblock %}
 
 {% block application_content %}
-<main>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        <h2 class="section-title">Step 1: Personal Information</h2>
+<form method="post" novalidate>
+    {% csrf_token %}
+    <h2>Personal Information</h2>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+        </div>
+    {% endif %}
 
-        <div class="address-row">
-            <div class="address-col">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
-            <div class="address-col">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
-        </div>
-        <div class="address-row">
-            <div class="address-col">{{ form.middle_name.label_tag }} {{ form.middle_name }}</div>
-            <div class="address-col">{{ form.email.label_tag }} {{ form.email }}</div>
-        </div>
-        <div class="address-row">
-            <div class="address-col">{{ form.phone.label_tag }} {{ form.phone }}</div>
-            <div class="address-col">{{ form.gender.label_tag }} {{ form.gender }}</div>
-        </div>
+    <div class="address-row">
+        <div class="address-col">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+        <div class="address-col">{{ form.middle_name.label_tag }} {{ form.middle_name }}</div>
+        <div class="address-col">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+    </div>
+    <div class="address-row">
+        <div class="address-col">{{ form.email.label_tag }} {{ form.email }}</div>
+        <div class="address-col">{{ form.phone.label_tag }} {{ form.phone }}</div>
+    </div>
+    <div class="address-row">
+        <div class="address-col">{{ form.gender.label_tag }} {{ form.gender }}</div>
+        <div class="address-col">{{ form.region.label_tag }} {{ form.region }}</div>
+        <div class="address-col">{{ form.district.label_tag }} {{ form.district }}</div>
+    </div>
 
-        <h5>Address Information</h5>
-        <div class="address-row">
-            <div class="address-col">
-                <label for="id_region">Region</label>
-                {{ form.region }}
-            </div>
-            <div class="address-col">
-                <label for="id_district">District</label>
-                {{ form.district }}
-            </div>
-        </div>
+    <button type="submit" class="btn">Save and Continue</button>
+</form>
 
-        <button type="submit">Save & Proceed to Payment</button>
-    </form>
-</main>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionSelect = document.querySelector('.cascade-region');
+    const districtSelect = document.querySelector('.cascade-district');
+    const districtUrlTemplate = "{% url 'apply:ajax_districts' 999 %}"; // Use a placeholder
+
+    const updateDistricts = (isInitialLoad = false) => {
+        const regionId = regionSelect.value;
+        // Only use the initial district ID on the first load
+        const districtToSelect = isInitialLoad ? '{{ form.instance.district.id|default_if_none:"" }}' : null;
+        
+        if (regionId) {
+            districtSelect.disabled = true;
+            districtSelect.innerHTML = '<option value="">Loading...</option>';
+
+            fetch(districtUrlTemplate.replace('999', regionId)) // Replace placeholder with actual ID
+                .then(response => response.json())
+                .then(data => {
+                    districtSelect.innerHTML = '<option value="">---------</option>';
+                    data.districts.forEach(district => {
+                        const option = new Option(district.name, district.id);
+                        if (district.id == districtToSelect) {
+                            option.selected = true;
+                        }
+                        districtSelect.add(option);
+                    });
+                    districtSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching districts:', error);
+                    districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+                    districtSelect.disabled = false;
+                });
+        } else {
+            districtSelect.innerHTML = '<option value="">---------</option>';
+        }
+    };
+
+    // When the region changes, call updateDistricts but not as initial load
+    regionSelect.addEventListener('change', () => updateDistricts(false));
+
+    // Run on page load and mark it as the initial one
+    updateDistricts(true);
+});
+</script>
 {% endblock %}
-
-{% block extra_js %}
-<script></script>
-{% endblock extra_js %}

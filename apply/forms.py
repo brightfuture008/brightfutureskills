@@ -18,7 +18,13 @@ class StudentForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['district'].queryset = District.objects.none()
+        if 'instance' in kwargs and kwargs['instance'] and kwargs['instance'].region:
+            self.fields['district'].queryset = District.objects.filter(region=kwargs['instance'].region).order_by('name')
+        else:
+            self.fields['district'].queryset = District.objects.none()
+
+        if 'region' in self.data:
+            self.fields['district'].queryset = District.objects.filter(region_id=self.data.get('region')).order_by('name')
 
 class CourseForm(forms.ModelForm):
     class Meta:
