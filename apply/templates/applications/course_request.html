@@ -1,66 +1,92 @@
 {% extends "applications/application_base.html" %}
 
-{% block title %}Step 3: Course Request{% endblock %}
+{% block title %}Course Selection{% endblock %}
 
 {% block application_content %}
-<main>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        <h2 class="section-title">Step 3: Select Your Courses</h2>
+<form method="post" novalidate id="course-request-form">
+    {% csrf_token %}
+    <h2>Course Selection</h2>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
-        <!-- First Course Choice -->
-        <h5>First Course Choice <span class="text-danger">*</span></h5>
+    <div class="course-selection-group">
+        <h5>First Choice</h5>
         <div class="address-row">
             <div class="address-col">
                 <label for="course1">Course</label>
-                <select name="course1" id="course1" class="form-select" required>
-                    <option value="">-- Select a Course --</option>
-                    {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.title }}</option>
-                    {% endfor %}
+                <select name="course1" id="course1" class="form-select course-select" data-session-target="#session1">
+                    <option value="">---------</option>
+                    {% for course in courses %}<option value="{{ course.id }}">{{ course.title }}</option>{% endfor %}
                 </select>
             </div>
             <div class="address-col">
                 <label for="session1">Session</label>
-                <select name="session1" id="session1" class="form-select" required>
-                    <option value="">-- Select a Session --</option>
-                    {% for session in sessions %}
-                        <option value="{{ session.id }}">{{ session.name }}</option>
-                    {% endfor %}
+                <select name="session1" id="session1" class="form-select session-select" disabled>
+                    <option value="">Select a course first</option>
                 </select>
             </div>
         </div>
+    </div>
 
-        <!-- Second Course Choice -->
-        <h5 class="mt-4">Second Course Choice (Optional)</h5>
+    <div class="course-selection-group">
+        <h5>Second Choice (Optional)</h5>
         <div class="address-row">
             <div class="address-col">
                 <label for="course2">Course</label>
-                <select name="course2" id="course2" class="form-select">
-                    <option value="">-- Select a Course (Optional) --</option>
-                    {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.title }}</option>
-                    {% endfor %}
+                <select name="course2" id="course2" class="form-select course-select" data-session-target="#session2">
+                    <option value="">---------</option>
+                    {% for course in courses %}<option value="{{ course.id }}">{{ course.title }}</option>{% endfor %}
                 </select>
             </div>
             <div class="address-col">
                 <label for="session2">Session</label>
-                <select name="session2" id="session2" class="form-select">
-                    <option value="">-- Select a Session (Optional) --</option>
-                    {% for session in sessions %}
-                        <option value="{{ session.id }}">{{ session.name }}</option>
-                    {% endfor %}
+                <select name="session2" id="session2" class="form-select session-select" disabled>
+                    <option value="">Select a course first</option>
                 </select>
             </div>
         </div>
+    </div>
 
-        <button type="submit">Submit Application</button>
-    </form>
-</main>
+    <button type="submit" class="btn">Submit Selection</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sessionUrlTemplate = "{% url 'apply:ajax_sessions' 999 %}";
+
+    document.querySelectorAll('.course-select').forEach(courseSelect => {
+        courseSelect.addEventListener('change', function() {
+            const courseId = this.value;
+            const sessionSelect = document.querySelector(this.dataset.sessionTarget);
+            
+            sessionSelect.innerHTML = '<option value="">Loading...</option>';
+            sessionSelect.disabled = true;
+
+            if (courseId) {
+                fetch(sessionUrlTemplate.replace('999', courseId))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.sessions && data.sessions.length > 0) {
+                            sessionSelect.innerHTML = '<option value="">---------</option>';
+                            data.sessions.forEach(session => {
+                                sessionSelect.add(new Option(session.name, session.id));
+                            });
+                            sessionSelect.disabled = false;
+                        } else {
+                            sessionSelect.innerHTML = '<option value="">No sessions for this course</option>';
+                        }
+                    });
+            } else {
+                sessionSelect.innerHTML = '<option value="">Select a course first</option>';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -18,6 +18,7 @@ class Course(models.Model):
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Cost per month")
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True, help_text="Upload a picture for the course.")
+    sessions = models.ManyToManyField(Session, blank=True, related_name='courses')
 
     @property
     def total_cost(self):

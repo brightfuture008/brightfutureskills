@@ -59,11 +59,16 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ('first_name', 'last_name', 'email', 'code')
     inlines = [EnrollmentInline]
 
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('title', 'course_id', 'duration_months', 'cost')
+    search_fields = ('title', 'course_id')
+    filter_horizontal = ('sessions',)
+
 admin_site = CustomAdminSite(name='custom_admin')
 
 admin_site.register(User, UserAdmin)
 admin_site.register(Student, StudentAdmin)
-admin_site.register(Course)
+admin_site.register(Course, CourseAdmin)
 admin_site.register(Session)
 admin_site.register(Region)
 admin_site.register(District)

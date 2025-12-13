@@ -6,6 +6,7 @@
 <form
   method="post"
   novalidate
+  class="prevent-exit-on-dirty"
   id="personal-info-form"
   data-districts-url-template="{% url 'apply:ajax_districts' 999 %}"
   data-initial-district-id="{{ form.instance.district.id|default_if_none:'' }}"

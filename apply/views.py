@@ -225,5 +225,9 @@ def ajax_districts(request, region_id):
     return JsonResponse({'districts': districts})
 
 def ajax_sessions(request, course_id):
-    sessions = list(Session.objects.all().values('id', 'name'))
+    try:
+        course = Course.objects.get(id=course_id)
+        sessions = list(course.sessions.all().values('id', 'name'))
+    except Course.DoesNotExist:
+        sessions = []
     return JsonResponse({'sessions': sessions})

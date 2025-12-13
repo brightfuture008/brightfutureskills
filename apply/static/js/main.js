@@ -40,6 +40,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Warn user before leaving a page with unsaved form changes
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form.prevent-exit-on-dirty').forEach(form => {
+        let isDirty = false;
+
+        // Mark form as dirty on any input change
+        form.addEventListener('input', () => {
+            isDirty = true;
+        });
+
+        // Reset dirty flag on form submission
+        form.addEventListener('submit', () => {
+            window.removeEventListener('beforeunload', beforeUnloadHandler);
+        });
+
+        const beforeUnloadHandler = (event) => {
+            if (isDirty) {
+                event.preventDefault();
+                event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        };
+
+        window.addEventListener('beforeunload', beforeUnloadHandler);
+    });
+});
+
 // Logout confirmation
 function confirmLogout(event) {
     event.preventDefault();
