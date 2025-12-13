@@ -68,7 +68,6 @@ header {
   display: flex;
   justify-content: space-between;
   text-decoration: none !important;
-  align-items: center;
   align-items: center; /* Vertically align items */
   padding: 0.75rem 1rem;
   text-decoration: dashed;
@@ -76,7 +75,6 @@ header {
   gap: 1rem; /* Add some space between title and toggler */
 }
 .site-title {
-  font-size: 1.1rem;
   font-size: 1.2rem; /* Base font size */
   text-align: left;
   padding: 0;

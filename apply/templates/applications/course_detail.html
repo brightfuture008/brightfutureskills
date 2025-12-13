@@ -18,8 +18,8 @@
             </div>
             <p class="course-description">{{ course.description|linebreaksbr|default:"No detailed description available for this course." }}</p>
             <div class="details-actions">
-                <a href="{% url 'apply:add_student' %}?course={{ course.id }}" class="btn btn-primary">Apply for this Course</a>
-                <a href="{% url 'apply:course_list' %}" class="btn btn-secondary">Back to Courses</a>
+                <a href="{% url 'apply:add_student' %}?course={{ course.id }}" class="btn btn-primary">Apply now</a>
+                <a href="{% url 'apply:course_list' %}" class="btn btn-secondary">Back</a>
             </div>
         </div>
     </div>
