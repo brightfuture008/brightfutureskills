@@ -16,7 +16,6 @@ class StudentForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class':'form-control'}),
             'email': forms.EmailInput(attrs={'class':'form-control'}),
         }
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['district'].queryset = District.objects.none()

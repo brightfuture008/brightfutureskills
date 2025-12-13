@@ -10,9 +10,6 @@ from users.models import Profile
 from .forms import StudentForm, CourseForm
 
 def home(request):
-    """
-    Renders the home page for all users.
-    """
     all_courses = Course.objects.all()
     return render(request, 'applications/home.html', {'courses': all_courses})
 
@@ -26,9 +23,6 @@ def course_list(request):
 
 @login_required
 def application_start(request):
-    """
-    Redirects user to the correct step in the application process.
-    """
     if hasattr(request.user, 'student'):
         profile, _ = Profile.objects.get_or_create(user=request.user)
         if profile.payment_status == Profile.PaymentStatus.APPROVED:
@@ -39,14 +33,9 @@ def application_start(request):
 
 @login_required
 def personal_info_view(request):
-    """
-    Step 1: Collect personal information.
-    """
-    # Get existing student instance if it exists, otherwise None.
     student_instance = getattr(request.user, 'student', None)
 
     if request.method == 'POST':
-        # Pass instance to the form to handle both creation and update.
         form = StudentForm(request.POST, instance=student_instance)
         if form.is_valid():
             student = form.save(commit=False)
@@ -55,7 +44,6 @@ def personal_info_view(request):
             messages.success(request, 'Personal information has been saved successfully.')
             return redirect('apply:payment')
     else:
-        # For a GET request, pre-populate the form if the student exists.
         form = StudentForm(instance=student_instance)
     
     regions = Region.objects.all()
@@ -67,9 +55,6 @@ def personal_info_view(request):
 
 @login_required
 def payment_view(request):
-    """
-    Step 2: Display payment instructions.
-    """
     if not hasattr(request.user, 'student'):
         messages.info(request, 'Please fill in your personal information first.')
         return redirect('apply:personal_info')
@@ -82,17 +67,12 @@ def payment_view(request):
 
 @login_required
 def course_request_view(request):
-    """
-    Step 3: Select courses after payment approval.
-    """
     if not hasattr(request.user, 'student'):
         messages.info(request, 'Please fill in your personal information first.')
         return redirect('apply:personal_info')
 
-    # Get or create the profile to handle users created before the signal.
     profile, created = Profile.objects.get_or_create(user=request.user)
 
-    # Check for payment approval
     if not request.user.is_staff and profile.payment_status != Profile.PaymentStatus.APPROVED:
         messages.warning(request, 'Your payment has not been approved yet.')
         return redirect('apply:payment')
@@ -106,7 +86,6 @@ def course_request_view(request):
         if course1_id and session1_id:
             with transaction.atomic():
                 student = request.user.student
-                # Clear previous enrollments to allow changes
                 student.enrollments.all().delete()
                 Enrollment.objects.create(student=student, course_id=course1_id, session_id=session1_id)
                 if course2_id and session2_id:
@@ -144,16 +123,10 @@ def course_detail(request, course_id):
 
 @login_required
 def payment_instructions(request):
-    """
-    DEPRECATED: Logic is now in payment_view.
-    """
     return redirect('apply:payment')
 
 @login_required
 def approve_payments_list(request):
-    """
-    Admin view to see users who are pending payment approval or are unpaid.
-    """
     if not request.user.is_staff:
         messages.error(request, "You do not have permission to access this page.")
         return redirect('apply:home')
@@ -163,11 +136,7 @@ def approve_payments_list(request):
 
 @login_required
 def mark_as_paid(request):
-    """
-    Allows a user to mark their payment as 'Pending' for admin review.
-    """
     if request.method == 'POST':
-        # Use get_or_create to prevent errors for users without a profile (e.g., superuser)
         profile, created = Profile.objects.get_or_create(user=request.user)
         profile.payment_status = Profile.PaymentStatus.PENDING
         profile.save()
@@ -184,10 +153,6 @@ def approve_user_payment(request, user_id):
 
 @login_required
 def student_profile(request):
-    """
-    Displays the registered student's profile/details page.
-    This view now renders the 'student_detail.html' template for a complete summary.
-    """
     student = get_object_or_404(Student, user=request.user)
     return render(request, 'applications/student_detail.html', {'student': student})
 
@@ -221,6 +186,5 @@ def ajax_districts(request, region_id):
     return JsonResponse({'districts': districts})
 
 def ajax_sessions(request, course_id):
-    # Since any course can be in any session, we return all available sessions.
     sessions = list(Session.objects.all().values('id', 'name'))
     return JsonResponse({'sessions': sessions})

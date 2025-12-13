@@ -11,7 +11,7 @@ class Session(models.Model):
         return self.name
 
 class Course(models.Model):
-    course_id = models.CharField(max_length=20, unique=True, blank=True)  # human id / code
+    course_id = models.CharField(max_length=20, unique=True, blank=True)
     title = models.CharField(max_length=200)
     lecturer = models.CharField(max_length=120, blank=True)
     duration_months = models.PositiveSmallIntegerField(default=1, help_text="Duration in months")    
@@ -45,7 +45,6 @@ class District(models.Model):
         return f"{self.name} ({self.region.name})"
 
 class Enrollment(models.Model):
-    """Links a Student to a specific Course and Session."""
     student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='enrollments')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
@@ -75,7 +74,6 @@ class Student(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            # Example code: BS2025-XXXX (random)
             while True:
                 year = timezone.now().year
                 rand = get_random_string(4, allowed_chars='0123456789')
