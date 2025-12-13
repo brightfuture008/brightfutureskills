@@ -16,9 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('users.urls')),
     path('', include('apply.urls')),
 ]
+
+# Serve media files during development
+# This is crucial for serving user-uploaded files (like course images) in development
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
