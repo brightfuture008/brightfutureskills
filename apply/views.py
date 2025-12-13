@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import transaction, models
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
 from .models import Student, Course, Region, District, Session, Enrollment, User
