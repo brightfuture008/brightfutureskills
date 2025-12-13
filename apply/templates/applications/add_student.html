@@ -1,112 +1,143 @@
 {% extends "applications/base.html" %}
-{% block title %}Apply - Step 1{% endblock title %}
+
+{% block title %}Apply for Courses{% endblock %}
 
 {% block content %}
 <section class="container my-5">
-  <h2 class="mb-4">New Student</h2>
-  <form method="post" class="student-form">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="{{ form.fullname.id_for_label }}" class="form-label">Full Name</label>
-      {{ form.fullname }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-      {{ form.email }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
-      {{ form.gender }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
-      {{ form.phone }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
-      {{ form.course }}
-    </div>
-    <div class="mb-3" id="session-container" style="display: none;">
-      <label for="{{ form.session.id_for_label }}" class="form-label">Session</label>
-      {{ form.session }}
-    </div>
+    <form method="post" class="student-form" novalidate>
+        <h2 class="mb-4 text-center">Student Application Form</h2>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="{{ form.fullname.id_for_label }}" class="form-label">Full Name</label>
+            {{ form.fullname }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+            {{ form.email }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
+            {{ form.phone }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+            {{ form.gender }}
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <label for="{{ form.region.id_for_label }}" class="form-label">Home Region</label>
+            {{ form.region }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.district.id_for_label }}" class="form-label">Home District</label>
+            {{ form.district }}
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <h5>First Course Choice</h5>
+            <label for="course1" class="form-label">Course</label>
+            <select name="course1" id="course1" class="form-select dynamic-course">
+                <option value="">---------</option>
+                {% for course in courses %}<option value="{{ course.id }}">{{ course.title }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="session1" class="form-label">Session</label>
+            <select name="session1" id="session1" class="form-select" disabled>
+                <option value="">Select a course first</option>
+            </select>
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <h5>Second Course Choice (Optional)</h5>
+            <label for="course2" class="form-label">Course</label>
+            <select name="course2" id="course2" class="form-select dynamic-course">
+                <option value="">---------</option>
+                {% for course in courses %}<option value="{{ course.id }}">{{ course.title }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="session2" class="form-label">Session</label>
+            <select name="session2" id="session2" class="form-select" disabled>
+                <option value="">Select a course first</option>
+            </select>
+        </div>
 
 
-    <hr>
-    <h5>Home address (Tanzania)</h5>
-    <div class="address-row">
-      <div class="address-col">
-        <label for="{{ form.region.id_for_label }}" class="form-label">Region</label>
-        {{ form.region }}
-      </div>
-      <div class="address-col">
-        <label for="{{ form.district.id_for_label }}" class="form-label">District</label>
-        {{ form.district }}
-      </div>
-    </div>
 
-    <button type="submit" class="btn btn-primary w-100 mt-4">Submit Application</button>
-  </form>
+
+        <button type="submit" class="btn btn-primary w-100 mt-3">Submit Application</button>
+    </form>
 </section>
-{% endblock content %}
+{% endblock %}
 
 {% block extra_js %}
 <script>
-$(document).ready(function(){
-  // Initialize Select2 for the course selection
-  $('.select2-course').select2({
-    theme: 'bootstrap-5'
-  });
+$(document).ready(function() {
+    const regionSelect = $("#{{ form.region.id_for_label }}");
+    const districtSelect = $("#{{ form.district.id_for_label }}");
+    const districtUrl = "{% url 'apply:ajax_districts' 0 %}".replace('0/', ''); // Correctly create the base URL
 
-  // For cascading districts
-  const tpl = "{% url 'apply:ajax_districts' 0 %}";
-  $('#id_region').on('change', function(){
-    const regionId = $(this).val();
-    const $district = $('#id_district');
-    $district.html('<option>Loading...</option>');
-    if (!regionId) { $district.html('<option value="">Choose region first</option>'); return; }
-    const url = tpl.replace('0', regionId);
-    $.getJSON(url)
-      .done(function(data){
-        let html = '<option value="">Choose district</option>';
-        if (data.districts && data.districts.length) {
-          data.districts.forEach(d => html += `<option value="${d.id}">${d.name}</option>`);
+    regionSelect.on('change', function() {
+        const regionId = $(this).val();
+        if (regionId) {
+            $.ajax({
+                url: districtUrl + regionId + '/',
+                success: function(data) {
+                    districtSelect.empty(); // Clear old options
+                    districtSelect.append('<option value="">---------</option>'); // Add a placeholder
+                    data.districts.forEach(function(district) {
+                        districtSelect.append(`<option value="${district.id}">${district.name}</option>`);
+                    });
+                    districtSelect.prop('disabled', false);
+                }
+            });
         } else {
-          html = '<option value="">No districts found</option>';
+            districtSelect.empty().append('<option value="">Select a region first</option>').prop('disabled', true);
         }
-        $district.html(html);
-      })
-      .fail(function(){ $district.html('<option value="">Error loading districts</option>'); });
-  });
+    });
 
-  if ($('#id_region').val()) $('#id_region').trigger('change');
-
-  // For cascading sessions based on course
-  const sessionUrlTemplate = "{% url 'apply:ajax_sessions' 0 %}";
-  $('.select2-course').on('change', function(){
-    const selectedCourses = $(this).val();
-    const $sessionSelect = $('#id_session');
-    const $sessionContainer = $('#session-container');
-
-    // We only show sessions if ONE course is selected, to avoid confusion.
-    if (!selectedCourses || selectedCourses.length !== 1) {
-      $sessionContainer.hide();
-      return;
+    if (regionSelect.val()) {
+        regionSelect.trigger('change');
     }
-    const courseId = selectedCourses[0];
-    const url = sessionUrlTemplate.replace('0', courseId);
-    $.getJSON(url)
-      .done(function(data){
-        if (data.sessions && data.sessions.length) {
-          let html = '<option value="">Choose session</option>';
-          data.sessions.forEach(s => html += `<option value="${s.id}">${s.name}</option>`);
-          $sessionSelect.html(html);
-          $sessionContainer.show();
+
+    // --- Dynamic Sessions Logic ---
+    const sessionUrl = "{% url 'apply:ajax_sessions' 0 %}".replace('0/', '');
+
+    $('.dynamic-course').on('change', function() {
+        const courseSelect = $(this);
+        const courseId = courseSelect.val();
+        const sessionSelectId = courseSelect.attr('id').replace('course', 'session');
+        const sessionSelect = $('#' + sessionSelectId);
+
+        if (courseId) {
+            $.ajax({
+                url: sessionUrl + courseId + '/',
+                success: function(data) {
+                    sessionSelect.empty().append('<option value="">---------</option>');
+                    if (data.sessions.length > 0) {
+                        data.sessions.forEach(function(session) {
+                            sessionSelect.append(`<option value="${session.id}">${session.name}</option>`);
+                        });
+                        sessionSelect.prop('disabled', false);
+                    } else {
+                        sessionSelect.append('<option value="">No sessions available</option>').prop('disabled', true);
+                    }
+                }
+            });
         } else {
-          $sessionContainer.hide();
+            sessionSelect.empty().append('<option value="">Select a course first</option>').prop('disabled', true);
         }
-      });
-  });
+    });
 });
 </script>
 {% endblock extra_js %}

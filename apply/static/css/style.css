@@ -84,7 +84,7 @@ header {
 h1 {
     margin: 1.5% 0;
     font-size: .5rem;
-    color: var(--color-white);
+    color:#999c01;
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 900;
     padding: 0 1%;

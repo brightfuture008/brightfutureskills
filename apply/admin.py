@@ -8,7 +8,6 @@ class SessionAdmin(admin.ModelAdmin):
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'course_id', 'cost')
-    filter_horizontal = ('sessions',) # This provides a much better UI for selecting sessions
 
 admin.site.register(Student)
 admin.site.register(Region)

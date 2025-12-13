@@ -18,7 +18,6 @@ class Course(models.Model):
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True, help_text="Upload a picture for the course.")
-    sessions = models.ManyToManyField(Session, blank=True, related_name='courses')
 
     def __str__(self):
         if self.course_id:
@@ -41,6 +40,16 @@ class District(models.Model):
     def __str__(self):
         return f"{self.name} ({self.region.name})"
 
+class Enrollment(models.Model):
+    """Links a Student to a specific Course and Session."""
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='enrollments')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.fullname} enrolled in {self.course.title} ({self.session.name})"
+
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     GENDER_CHOICES = (('M','Male'),('F','Female'))
@@ -49,10 +58,9 @@ class Student(models.Model):
     email = models.EmailField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
     phone = models.CharField(max_length=20, blank=True)
-    course = models.ManyToManyField(Course, blank=True, related_name='students')
+    courses = models.ManyToManyField(Course, through=Enrollment, blank=True, related_name='enrolled_students')
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
-    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):

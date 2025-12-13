@@ -5,16 +5,14 @@ from django.forms.widgets import Select
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['fullname','email','gender','phone','course','session','region','district']
+        fields = ['fullname','email','gender','phone','region','district']
         widgets = {
             'gender': forms.Select(attrs={'class':'form-select'}),
-            'course': forms.SelectMultiple(attrs={'class': 'select2-course', 'data-placeholder': 'Select one or more courses'}),
             'region': forms.Select(attrs={'class': 'form-select cascade-region'}),
             'district': forms.Select(attrs={'class': 'form-select cascade-district'}),
             'phone': forms.TextInput(attrs={'class':'form-control'}),
             'fullname': forms.TextInput(attrs={'class':'form-control'}),
             'email': forms.EmailInput(attrs={'class':'form-control'}),
-            'session': forms.Select(attrs={'class':'form-select'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -24,7 +22,7 @@ class StudentForm(forms.ModelForm):
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['course_id','title','lecturer','duration_months','cost','description', 'sessions']
+        fields = ['course_id','title','lecturer','duration_months','cost','description', 'image']
         widgets = {
             'title': forms.TextInput(attrs={'class':'form-control'}),
             'lecturer': forms.TextInput(attrs={'class':'form-control'}),
@@ -32,5 +30,4 @@ class CourseForm(forms.ModelForm):
             'cost': forms.NumberInput(attrs={'class':'form-control','step':'0.01'}),
             'description': forms.Textarea(attrs={'class':'form-control','rows':4}),
             'course_id': forms.TextInput(attrs={'class':'form-control'}),
-            'sessions': forms.SelectMultiple(attrs={'class': 'form-select', 'size': 4}),
         }

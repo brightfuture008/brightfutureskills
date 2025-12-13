@@ -24,17 +24,18 @@
   <nav class="nav-bar">
     <ul class="nav-links">
       <li><a href="{% url 'apply:home' %}">Home</a></li>
-      <li><a href="{% url 'apply:add_student' %}">Apply</a></li>
       <li><a href="{% url 'apply:course_list' %}">Courses</a></li>
-      <li><a href="#contact">Contact</a></li>
       {% if user.is_authenticated %}
+        <li><a href="{% url 'apply:add_student' %}">Apply</a></li>
+        <li><a href="#contact">Contact</a></li>
         <li>
           <form id="logout-form" action="{% url 'users:logout' %}" method="post" style="display: none;">
               {% csrf_token %}
           </form>
-          <a href="#" onclick="document.getElementById('logout-form').submit(); return false;" class="btn-logout">Logout</a>
+          <a href="#" onclick="confirmLogout(event)" class="btn-logout">Logout</a>
         </li>
       {% else %}
+        <li><a href="{% url 'users:signup' %}">Signup</a></li>
         <li><a href="{% url 'users:login' %}" class="btn-login">Login</a></li>
       {% endif %}
     </ul>
@@ -93,10 +94,30 @@
       crossorigin="anonymous">
     </script>
 
+    <script 
+      src="https://code.jquery.com/jquery-3.6.0.min.js" 
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" 
+      crossorigin="anonymous">
+    </script>
+
+    <script 
+      src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
+    </script>
+
+    {% block extra_js %}{% endblock extra_js %}
+
     <!-- Custom animations and UI enhancements -->
     <script src="{% static 'js/animations.js' %}"></script>
     <script src="{% static 'js/background-animation.js' %}"></script>
 
+    <script>
+      function confirmLogout(event) {
+        event.preventDefault();
+        if (confirm("Are you sure you want to log out?")) {
+          document.getElementById('logout-form').submit();
+        }
+      }
+    </script>
     <script>
   (function(){
     const toastWrap = document.getElementById('toast-wrap');
@@ -143,7 +164,5 @@
     window.ui = { toast: showToast, loading: { show: showLoading, hide: hideLoading } };
   })();
 </script>
-
-    {% block extra_js %}{% endblock extra_js %}
 </body>
 </html>

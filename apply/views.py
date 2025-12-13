@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
 from django.urls import reverse
-from .models import Student, Course, Region, District, Session
+from .models import Student, Course, Region, District, Session, Enrollment
 from .forms import StudentForm, CourseForm
 
 def home(request):
@@ -25,7 +27,7 @@ def course_list(request):
 def add_student(request):
     """
     Handles student application form for logged-in users.
-    If the user already has a student profile, it redirects them.
+    If a logged-in user already has a student profile, it redirects them.
     """
     if hasattr(request.user, 'student'):
         # User is already registered as a student, show the 'already_registered' page
@@ -35,11 +37,23 @@ def add_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
-            student = form.save(commit=False)
-            student.user = request.user  # Link the student to the logged-in user
-            student.save()
-            # This is crucial for saving ManyToMany fields like 'course'
-            form.save_m2m()
+            with transaction.atomic():
+                student = form.save(commit=False)
+                student.user = request.user
+                student.save()
+
+                # Process first course enrollment
+                course1_id = request.POST.get('course1')
+                session1_id = request.POST.get('session1')
+                if course1_id and session1_id:
+                    Enrollment.objects.create(student=student, course_id=course1_id, session_id=session1_id)
+
+                # Process second course enrollment
+                course2_id = request.POST.get('course2')
+                session2_id = request.POST.get('session2')
+                if course2_id and session2_id:
+                    Enrollment.objects.create(student=student, course_id=course2_id, session_id=session2_id)
+
             return redirect('apply:student_profile')
     else:
         initial_data = {}
@@ -49,9 +63,14 @@ def add_student(request):
         form = StudentForm(initial=initial_data)
     
     regions = Region.objects.all()
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+
     return render(request, 'applications/add_student.html', {
         'form': form,
         'regions': regions,
+        'courses': courses,
+        'sessions': sessions,
     })
 
 def add_course(request):
@@ -111,6 +130,6 @@ def ajax_districts(request, region_id):
     return JsonResponse({'districts': districts})
 
 def ajax_sessions(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    sessions = list(course.sessions.all().values('id', 'name'))
+    # Since any course can be in any session, we return all available sessions.
+    sessions = list(Session.objects.all().values('id', 'name'))
     return JsonResponse({'sessions': sessions})

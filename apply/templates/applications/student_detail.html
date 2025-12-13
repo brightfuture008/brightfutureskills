@@ -1,52 +1,48 @@
 {% extends "applications/base.html" %}
-{% block title %}Application Successful{% endblock title %}
+{% block title %}My Profile - {{ student.fullname }}{% endblock title %}
 
 {% block content %}
 <section class="container my-5">
-  <div class="card shadow-sm">
-    <div class="card-header card-header-custom text-white">
-      <h2> Application Received Successfully!</h2>
   <div class="card shadow-sm summary-card">
     <div class="card-header card-header-success text-white text-center">
-      <h2 class="h4 mb-0"> Application Received Successfully!</h2>
+      <h2 class="h4 mb-0">Application Received Successfully!</h2>
     </div>
-    <div class="card-body">
-      <p class="lead">Thank you, <strong>{{ student.fullname }}</strong>. We have received your application. Your reference code is <strong>{{ student.code }}</strong>.</p>
     <div class="card-body p-4">
       <p class="lead text-center">Thank you, <strong>{{ student.fullname }}</strong>. We have received your application.</p>
       <hr>
-      <h5 class="mt-4">Application Summary:</h5>
       <h5 class="text-center mb-4">Application Summary</h5>
       
       <p><strong>Registration Code:</strong> <span class="text-highlight">{{ student.code }}</span></p>
       <div class="row">
         <div class="col-md-6">
           <p><strong>Full Name:</strong> {{ student.fullname }}</p>
-          <p><strong>Email:</strong> {{ student.email }}</p>
+          <p><strong>Email:</strong> <a href="mailto:{{ student.email }}">{{ student.email }}</a></p>
           <p><strong>Phone:</strong> {{ student.phone }}</p>
           <p><strong>Gender:</strong> {{ student.get_gender_display }}</p>
         </div>
         <div class="col-md-6">
-          <p><strong>Gender:</strong> {{ student.get_gender_display }}</p>
           <p><strong>Home Region:</strong> {{ student.region.name|default:"N/A" }}</p>
           <p><strong>Home District:</strong> {{ student.district.name|default:"N/A" }}</p>
-          <p><strong>Selected Session:</strong> {{ student.session.name|default:"N/A" }}</p>
         </div>
       </div>
-      {% if student.session %}<p><strong>Selected Session:</strong> {{ student.session.name }}</p>{% endif %}
 
       <h5 class="mt-4">Selected Course(s):</h5>
-      <ul class="list-group">
       <ul class="list-group list-group-flush mb-3">
-        {% for course in student.course.all %}
-          <li class="list-group-item">{{ course.title }}</li>
+        {% for enrollment in student.enrollments.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ enrollment.course.title }}</strong>
+            </div>
+            <span class="badge bg-primary rounded-pill">{{ enrollment.session.name }}</span>
+          </li>
         {% empty %}
-          <li class="list-group-item text-muted">No courses were selected.</li>
+          <li class="list-group-item text-muted">You have not enrolled in any courses yet.</li>
         {% endfor %}
       </ul>
 
       <div class="details-actions mt-4">
-        <a href="{% url 'apply:edit_student' %}" class="btn btn-secondary">Edit Information</a>
+        <!-- The edit button can be re-enabled later if needed -->
+        <!-- <a href="{% url 'apply:edit_student' %}" class="btn btn-secondary">Edit Information</a> -->
         <a href="{% url 'apply:home' %}" class="btn btn-primary">Back to Home</a>
       </div>
     </div>
