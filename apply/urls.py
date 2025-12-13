@@ -6,6 +6,7 @@ app_name = 'apply'
 urlpatterns = [
     path('', views.home, name='home'),
     path('apply/', views.add_student, name='add_student'),
+    path('apply/confirm/', views.confirm_student_application, name='confirm_student_application'),
     path('my-profile/', views.student_profile, name='student_profile'),
     path('my-profile/edit/', views.edit_student, name='edit_student'),
     path('courses/', views.course_list, name='course_list'),

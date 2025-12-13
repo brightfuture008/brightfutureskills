@@ -1,0 +1,61 @@
+{% extends "applications/base.html" %}
+
+{% block title %}Confirm Your Application{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+    <div class="card shadow-sm summary-card">
+        <div class="card-header card-header-custom text-white text-center">
+            <h2 class="h4 mb-0">Please Confirm Your Information</h2>
+        </div>
+        <div class="card-body p-4">
+            <p class="lead text-center">Review the details below. If everything is correct, click "Confirm & Submit".</p>
+            <hr>
+
+            <h5 class="text-center mb-4">Personal Information</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Full Name:</strong> {{ data.fullname }}</p>
+                    <p><strong>Email:</strong> {{ data.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Phone:</strong> {{ data.phone }}</p>
+                    <p><strong>Gender:</strong> {% if data.gender == 'M' %}Male{% else %}Female{% endif %}</p>
+                </div>
+            </div>
+
+            <h5 class="mt-4 text-center mb-4">Address Information</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Home Region:</strong> {{ region.name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Home District:</strong> {{ district.name }}</p>
+                </div>
+            </div>
+
+            <h5 class="mt-4">Selected Course(s)</h5>
+            <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div><strong>{{ course1.title }}</strong></div>
+                    <span class="badge bg-primary rounded-pill">{{ session1.name }}</span>
+                </li>
+                {% if course2 %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div><strong>{{ course2.title }}</strong></div>
+                    <span class="badge bg-primary rounded-pill">{{ session2.name }}</span>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="details-actions mt-4">
+                <a href="{% url 'apply:add_student' %}" class="btn btn-secondary">Go Back & Edit</a>
+                <form method="post" action="{% url 'apply:confirm_student_application' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Confirm & Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

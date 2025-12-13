@@ -36,31 +36,20 @@ def add_student(request):
 
     if request.method == 'POST':
         form = StudentForm(request.POST)
-        if form.is_valid():
-            with transaction.atomic():
-                student = form.save(commit=False)
-                student.user = request.user
-                student.save()
+        course1_id = request.POST.get('course1')
+        session1_id = request.POST.get('session1')
 
-                # Process first course enrollment
-                course1_id = request.POST.get('course1')
-                session1_id = request.POST.get('session1')
-                if course1_id and session1_id:
-                    Enrollment.objects.create(student=student, course_id=course1_id, session_id=session1_id)
-
-                # Process second course enrollment
-                course2_id = request.POST.get('course2')
-                session2_id = request.POST.get('session2')
-                if course2_id and session2_id:
-                    Enrollment.objects.create(student=student, course_id=course2_id, session_id=session2_id)
-
-            return redirect('apply:student_profile')
+        if form.is_valid() and course1_id and session1_id:
+            # Data is valid, store it in the session and redirect to confirmation page
+            request.session['student_application_data'] = request.POST.copy()
+            return redirect('apply:confirm_student_application')
+        else:
+            # Add a custom error if the first course/session is not selected
+            if not course1_id or not session1_id:
+                messages.error(request, 'Please select both a course and a session for your first choice.')
+            # The form will re-render with existing errors
     else:
-        initial_data = {}
-        course_id = request.GET.get('course')
-        if course_id:
-            initial_data['course'] = course_id
-        form = StudentForm(initial=initial_data)
+        form = StudentForm()
     
     regions = Region.objects.all()
     courses = Course.objects.all()
@@ -72,6 +61,59 @@ def add_student(request):
         'courses': courses,
         'sessions': sessions,
     })
+
+@login_required
+def confirm_student_application(request):
+    """
+    Step 2 of Student Application: Display data for confirmation and handle final submission.
+    """
+    application_data = request.session.get('student_application_data')
+
+    if not application_data:
+        messages.error(request, 'Your session has expired. Please start the application again.')
+        return redirect('apply:add_student')
+
+    if request.method == 'POST':
+        # User has confirmed, now we save the data
+        form = StudentForm(application_data)
+        if form.is_valid():
+            with transaction.atomic():
+                student = form.save(commit=False)
+                student.user = request.user
+                student.save()
+
+                # Process first course enrollment
+                course1_id = application_data.get('course1')
+                session1_id = application_data.get('session1')
+                if course1_id and session1_id:
+                    Enrollment.objects.create(student=student, course_id=course1_id, session_id=session1_id)
+
+                # Process second course enrollment
+                course2_id = application_data.get('course2')
+                session2_id = application_data.get('session2')
+                if course2_id and session2_id:
+                    Enrollment.objects.create(student=student, course_id=course2_id, session_id=session2_id)
+
+            # Clean up the session
+            del request.session['student_application_data']
+            
+            return redirect('apply:student_profile')
+        else:
+            # This should ideally not happen if data was valid before
+            messages.error(request, 'An unexpected error occurred. Please try again.')
+            return redirect('apply:add_student')
+
+    # Prepare context for the confirmation template
+    context = {
+        'data': application_data,
+        'course1': Course.objects.get(id=application_data.get('course1')),
+        'session1': Session.objects.get(id=application_data.get('session1')),
+        'course2': Course.objects.get(id=application_data.get('course2')) if application_data.get('course2') else None,
+        'session2': Session.objects.get(id=application_data.get('session2')) if application_data.get('session2') else None,
+        'region': Region.objects.get(id=application_data.get('region')),
+        'district': District.objects.get(id=application_data.get('district')),
+    }
+    return render(request, 'applications/confirm_application.html', context)
 
 def add_course(request):
     if request.method == 'POST':

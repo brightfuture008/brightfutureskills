@@ -45,14 +45,14 @@
         <div class="mb-3">
             <h5>First Course Choice</h5>
             <label for="course1" class="form-label">Course</label>
-            <select name="course1" id="course1" class="form-select dynamic-course">
+            <select name="course1" id="course1" class="form-select dynamic-course" required>
                 <option value="">---------</option>
                 {% for course in courses %}<option value="{{ course.id }}">{{ course.title }}</option>{% endfor %}
             </select>
         </div>
         <div class="mb-3">
             <label for="session1" class="form-label">Session</label>
-            <select name="session1" id="session1" class="form-select" disabled>
+            <select name="session1" id="session1" class="form-select" disabled required>
                 <option value="">Select a course first</option>
             </select>
         </div>
