@@ -28,7 +28,7 @@
       {% if user.is_authenticated %}
         <li><a href="{% url 'apply:application_start' %}">Apply</a></li>
         {% if user.is_staff %}
-          <li><a href="{% url 'admin:approve_payments_list' %}" class="btn-admin">Approve Payments</a></li>
+          <li><a href="{% url 'custom_admin:payments_list' %}" class="btn-admin">Payments</a></li>
         {% endif %}
         <li><a href="#contact">Contact</a></li>
         <li>
