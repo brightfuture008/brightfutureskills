@@ -2,43 +2,27 @@
 
 {% block content %}
 <div id="content-main">
-    <div class="admin-app-list">
-        
-        <!-- Custom Payment Management Card -->
-        <div class="app-payments module">
-            <table>
-                <caption>
-                    <a href="{% url 'admin:approve_payments_list' %}" class="section" title="Manage student payments">Payment Management</a>
-                </caption>
-                <tbody>
-                    <tr class="model-payment">
-                        <th scope="row">
-                            <a href="{% url 'admin:approve_payments_list' %}">
-                                Pending Approvals
-                                {% if pending_payment_count > 0 %}<span class="badge">{{ pending_payment_count }}</span>{% endif %}
-                            </a>
-                        </th>
-                        <td><a href="{% url 'admin:approve_payments_list' %}" class="changelink">View</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Default Apps -->
-        {% for app in app_list %}
-            <div class="app-{{ app.app_label }} module">
-                <table>
-                    <caption><a href="{{ app.app_url }}" class="section">{{ app.name }}</a></caption>
-                    {% for model in app.models %}
-                        <tr class="model-{{ model.object_name|lower }}">
-                            <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                            <td><a href="{{ model.add_url }}" class="addlink">Add</a></td>
-                            <td><a href="{{ model.admin_url }}" class="changelink">Change</a></td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        {% endfor %}
+    
+    <!-- Custom Payment Management Card -->
+    <div class="app-payments module">
+        <table>
+            <caption>
+                <a href="{% url 'custom_admin:payments_list' %}" class="section" title="Manage student payments">Payment Management</a>
+            </caption>
+            <tbody>
+                <tr class="model-payment">
+                    <th scope="row">
+                        <a href="{% url 'custom_admin:payments_list' %}">
+                            Pending Approvals
+                            {% if pending_payment_count > 0 %}<span class="badge" style="background-color: var(--object-tools-fg); color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.8em; margin-left: 5px;">{{ pending_payment_count }}</span>{% endif %}
+                        </a>
+                    </th>
+                    <td><a href="{% url 'custom_admin:payments_list' %}" class="changelink">View</a></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+
+    {{ block.super }}
 </div>
 {% endblock %}
