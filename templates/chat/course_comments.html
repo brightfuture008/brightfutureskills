@@ -1,0 +1,28 @@
+<div class="mt-5 p-4 bg-white rounded shadow-sm">
+    <h3 class="mb-4">Course Comments</h3>
+    
+    <div class="mb-4">
+        {% for comment in course.comments.all %}
+            <div class="d-flex mb-3 border-bottom pb-3">
+                <div class="flex-grow-1">
+                    <h5 class="mt-0 mb-1">{{ comment.user.username }} <small class="text-muted" style="font-size: 0.8rem;">{{ comment.created_at|date:"M d, Y" }}</small></h5>
+                    {{ comment.content }}
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">No comments yet. Be the first to share your thoughts!</p>
+        {% endfor %}
+    </div>
+    
+    {% if user.is_authenticated %}
+        <form action="{% url 'chat:add_comment' course.id %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea name="content" class="form-control" rows="3" placeholder="Write a comment..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'users:login' %}">Login</a> to post comments.</p>
+    {% endif %}
+</div>

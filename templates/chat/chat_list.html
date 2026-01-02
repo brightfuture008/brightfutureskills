@@ -1,0 +1,17 @@
+{% extends "applications/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Select a Conversation</h2>
+    <div class="list-group mt-3">
+        {% for contact in contacts %}
+        <a href="{% url 'chat:chat_with' contact.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            {% if request.user.is_staff %}{{ contact.username }}{% else %}Admin{% endif %}
+            {% if contact.is_superuser %} <span class="badge bg-primary rounded-pill">Admin</span> {% endif %}
+        </a>
+        {% empty %}
+        <p class="text-muted">No conversations found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

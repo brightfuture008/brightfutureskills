@@ -22,12 +22,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 INSTALLED_APPS = [
+    'daphne',
     'jazzmin',
     'apply',
     'users',
+    'chat',
 
     'django.contrib.admin',
     'django.contrib.auth',
+    'channels',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -45,6 +48,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'root.urls'
+
+ASGI_APPLICATION = 'root.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 TEMPLATES = [
     {

@@ -28,8 +28,9 @@
       <li><a href="{% url 'apply:course_list' %}">Courses</a></li>
       {% if user.is_authenticated %}
         <li><a href="{% url 'apply:application_start' %}">Apply</a></li>
+        <li><a href="{% url 'chat:chat_list' %}">Chat</a></li>
         {% if user.is_staff %}
-          <li><a href="{% url 'custom_admin:payments_list' %}" class="btn-admin">Payments</a></li>
+          <li><a href="{% url 'apply:approve_payments_list' %}" class="btn-admin">Payments</a></li>
         {% endif %}
         <li><a href="#contact">Contact</a></li>
         <li>

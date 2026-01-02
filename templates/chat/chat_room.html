@@ -1,0 +1,122 @@
+{% extends "applications/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="user-info">
+                {% if request.user.is_staff %}
+                <a href="{% url 'chat:chat_list' %}" class="text-white me-2"><i class="bi bi-arrow-left"></i></a>
+                {% endif %}
+                <div class="user-avatar">
+                    {% if request.user.is_staff %}{{ target_user.username|make_list|first|upper }}{% else %}A{% endif %}
+                </div>
+                <div>
+                    <div class="fw-bold">{% if request.user.is_staff %}{{ target_user.username }}{% else %}Admin{% endif %}</div>
+                    <div class="typing-indicator" id="typing-indicator"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-log">
+            {% for msg in chat_history %}
+                <div class="message-bubble {% if msg.sender == request.user %}message-sent{% else %}message-received{% endif %}">
+                    {{ msg.message }}
+                    <span class="message-time">{{ msg.timestamp|date:"H:i" }}</span>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted mt-5" id="no-messages">No messages yet. Start the conversation!</p>
+            {% endfor %}
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-message-input" placeholder="Type a message...">
+            <button id="chat-message-submit"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const targetUserId = {{ target_user.id }};
+    const currentUserId = {{ request.user.id }};
+    
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const chatSocket = new WebSocket(
+        protocol + window.location.host + '/ws/chat/' + targetUserId + '/'
+    );
+
+    const chatLog = document.querySelector('#chat-log');
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        
+        if (data.type === 'typing') {
+            const indicator = document.getElementById('typing-indicator');
+            if (data.sender_id !== currentUserId) {
+                indicator.innerText = data.typing ? 'typing...' : '';
+            }
+            return;
+        }
+
+        const message = data.message;
+        const senderId = data.sender_id;
+        
+        const noMessages = document.querySelector('#no-messages');
+        if (noMessages) {
+            noMessages.remove();
+        }
+
+        const isMe = senderId === currentUserId;
+        const bubbleClass = isMe ? 'message-sent' : 'message-received';
+        
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+        const messageHtml = `
+            <div class="message-bubble ${bubbleClass}">
+                ${message}
+                <span class="message-time">
+                    ${timeString}
+                    ${isMe ? '<i class="bi bi-check2-all text-primary"></i>' : ''}
+                </span>
+            </div>
+        `;
+        
+        chatLog.insertAdjacentHTML('beforeend', messageHtml);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    let typingTimeout;
+    const messageInput = document.querySelector('#chat-message-input');
+
+    messageInput.onkeyup = function(e) {
+        if (e.key === 'Enter') {
+            document.querySelector('#chat-message-submit').click();
+            return;
+        }
+        
+        // Send typing status
+        chatSocket.send(JSON.stringify({'typing': true}));
+        
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            chatSocket.send(JSON.stringify({'typing': false}));
+        }, 1000);
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        if (message.trim()) {
+            chatSocket.send(JSON.stringify({'message': message}));
+            messageInputDom.value = '';
+            chatSocket.send(JSON.stringify({'typing': false}));
+        }
+    };
+</script>
+{% endblock %}
