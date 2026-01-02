@@ -1,0 +1,27 @@
+{% load i18n admin_extras %}
+<div class="col-5">
+    <div class="dataTables_info" role="status" aria-live="polite">
+        {{ cl.result_count }} {% trans 'results' %}
+        {% if cl.formset and cl.result_count %}
+            <input type="submit" name="_save" class="btn btn-sm btn-success" value="{% trans 'Save' %}">
+        {% endif %}
+    </div>
+</div>
+
+<div class="col-7">
+    <ul class="pagination pagination-sm m-0 float-right">
+        {% if pagination_required %}
+            {% for i in page_range %}
+                {% if i == cl.page_num %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% elif i == '.' %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% else %}
+                    <li class="page-item">
+                        <a href="{% admin_page_url cl i %}" class="page-link">{{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>

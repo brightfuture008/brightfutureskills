@@ -9,7 +9,7 @@
 {% block coltype %}colM{% endblock %}
 
 {% block content %}
-<div id="content-main">
+<div class="container-fluid">
     <h1>Payment Management</h1>
 
     {% if messages %}
@@ -18,21 +18,30 @@
     </ul>
     {% endif %}
 
-    <div id="changelist-filter" class="changelist-filter-container">
-        <h2>Search Users</h2>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Search Users</h6>
+        </div>
+        <div class="card-body">
         <form method="get" action="">
-            <div class="search-bar-container">
-                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by username or email..." size="40">
-                <button type="submit">Search</button>
-                {% if search_query %}<a href="{% url 'admin:approve_payments_list' %}" class="button">Clear</a>{% endif %}
+            <div class="input-group">
+                <input type="text" class="form-control bg-light border-0 small" name="q" value="{{ search_query }}" placeholder="Search by username or email..." aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    {% if search_query %}<a href="{% url 'apply:approve_payments_list' %}" class="btn btn-secondary">Clear</a>{% endif %}
+                </div>
             </div>
         </form>
+        </div>
     </div>
 
-    <div class="module" id="changelist-pending">
-        <h2>Pending Approval ({{ pending_users.count }})</h2>
-        <div class="results">
-            <table id="result_list">
+    <div class="card shadow mb-4 border-left-warning">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-warning">Pending Approval ({{ pending_users.count }})</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th scope="col" class="sortable column-username">Username</th>
@@ -50,7 +59,7 @@
                         <td>
                             <form method="post" action="{% url 'apply:approve_user_payment' user.id %}" class="inline-form">
                                 {% csrf_token %}
-                                <button type="submit" class="button">Approve</button>
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
                             </form>
                         </td>
                     </tr>
@@ -61,13 +70,17 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
-    <div class="module" id="changelist-unpaid">
-        <h2>Unpaid Users</h2>
-        <div class="results">
-            <table id="result_list_unpaid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Unpaid Users</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th scope="col" class="sortable column-username">Username</th>
@@ -89,6 +102,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

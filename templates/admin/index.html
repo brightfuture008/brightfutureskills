@@ -1,0 +1,334 @@
+{% extends "admin/base_site.html" %}
+{% load static dashboard_stats %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+{% get_dashboard_stats as stats %}
+
+<div class="container-fluid">
+    <!-- KPI Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Students</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_students }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_courses }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Regions Reached</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_regions }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-globe-africa fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Growth Chart Row -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Student Registration Growth (Last 12 Months)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts & Map Row -->
+    <div class="row">
+        <!-- Course Stats -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Popular Courses</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper">
+                        <canvas id="courseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Student Distribution (Tanzania)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper">
+                        <div id="tanzania-map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regional Stats Graph -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Top Regions by Enrollment</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Top Districts (Homeland Population)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper">
+                        <canvas id="districtChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Insights / Suggestions -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow mb-4 border-left-info">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info"><i class="fas fa-robot mr-2"></i>AI Insights & Suggestions</h6>
+                </div>
+                <div class="card-body">
+                    {% if stats.suggestions %}
+                        <ul class="list-group list-group-flush">
+                            {% for suggestion in stats.suggestions %}
+                                <li class="list-group-item"><i class="fas fa-lightbulb text-warning mr-2"></i> {{ suggestion }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No specific suggestions at this time. Keep growing your data!</p>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Management -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Payment Management</h6>
+                    <a href="{% url 'apply:approve_payments_list' %}" class="btn btn-sm btn-primary shadow-sm">Manage Payments</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'apply:approve_payments_list' %}" class="font-weight-bold text-dark">
+                                            Pending Approvals
+                                            {% if pending_payment_count > 0 %}
+                                                <span class="badge badge-danger ml-2">{{ pending_payment_count }}</span>
+                                            {% else %}
+                                                <span class="badge badge-success ml-2">0</span>
+                                            {% endif %}
+                                        </a>
+                                    </td>
+                                    <td class="text-right">
+                                        <a href="{% url 'apply:approve_payments_list' %}" class="btn btn-info btn-sm">View</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Default App List (Jazzmin handles this in sidebar, but if you want it here) -->
+    {# Jazzmin usually puts apps in the sidebar, so we can omit block.super or keep it if you want the default list below #}
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Data from Django
+        const courseLabels = {{ stats.course_labels|safe }};
+        const courseData = {{ stats.course_data|safe }};
+        const regionLabels = {{ stats.region_labels|safe }};
+        const regionData = {{ stats.region_data|safe }};
+        const regionMapData = {{ stats.region_map_data|safe }};
+        const growthLabels = {{ stats.growth_labels|safe }};
+        const growthData = {{ stats.growth_data|safe }};
+        const districtLabels = {{ stats.district_labels|safe }};
+        const districtData = {{ stats.district_data|safe }};
+
+        // 1. Course Chart (Bar)
+        new Chart(document.getElementById('courseChart'), {
+            type: 'bar',
+            data: {
+                labels: courseLabels,
+                datasets: [{
+                    label: 'Students Registered',
+                    data: courseData,
+                    backgroundColor: '#4a69bd',
+                    borderRadius: 5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 2. Region Chart (Line/Area)
+        new Chart(document.getElementById('regionChart'), {
+            type: 'line',
+            data: {
+                labels: regionLabels,
+                datasets: [{
+                    label: 'Enrollment by Region',
+                    data: regionData,
+                    borderColor: '#07ff6e',
+                    backgroundColor: 'rgba(7, 255, 110, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 3. Growth Chart (Line)
+        new Chart(document.getElementById('growthChart'), {
+            type: 'line',
+            data: {
+                labels: growthLabels,
+                datasets: [{
+                    label: 'New Registrations',
+                    data: growthData,
+                    borderColor: '#4a69bd',
+                    backgroundColor: 'rgba(74, 105, 189, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 4. District Chart (Bar)
+        new Chart(document.getElementById('districtChart'), {
+            type: 'bar',
+            data: {
+                labels: districtLabels,
+                datasets: [{
+                    label: 'Students by District',
+                    data: districtData,
+                    backgroundColor: '#f6b93b',
+                    borderRadius: 4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+        });
+
+        // 3. Map of Tanzania (Leaflet)
+        const map = L.map('tanzania-map').setView([-6.369028, 34.888822], 5); // Center on Tanzania
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Fetch Tanzania GeoJSON
+        fetch('https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/tanzania.geojson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJson(data, {
+                    style: function(feature) {
+                        const name = feature.properties.name;
+                        // Simple logic: if name matches our data, highlight it. 
+                        // Note: GeoJSON names might differ slightly from DB names (e.g. "Dar es Salaam" vs "Dar es Salaam Region")
+                        let count = 0;
+                        // Try to find partial match
+                        for (const [dbName, dbCount] of Object.entries(regionMapData)) {
+                            if (dbName.includes(name) || name.includes(dbName)) {
+                                count = dbCount;
+                                break;
+                            }
+                        }
+                        
+                        return {
+                            fillColor: count > 0 ? '#4a69bd' : '#ccc',
+                            weight: 1,
+                            opacity: 1,
+                            color: 'white',
+                            fillOpacity: count > 0 ? 0.7 : 0.3
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const name = feature.properties.name;
+                        let count = 0;
+                        for (const [dbName, dbCount] of Object.entries(regionMapData)) {
+                            if (dbName.includes(name) || name.includes(dbName)) {
+                                count = dbCount;
+                                break;
+                            }
+                        }
+                        layer.bindPopup(`<b>${name}</b><br>Students: ${count}`);
+                    }
+                }).addTo(map);
+            });
+    });
+</script>
+{% endblock %}
