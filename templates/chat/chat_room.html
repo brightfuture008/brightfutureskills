@@ -20,7 +20,7 @@
 
         <div class="chat-messages" id="chat-log">
             {% for msg in chat_history %}
-                <div class="message-bubble {% if msg.sender == request.user %}message-sent{% else %}message-received{% endif %}">
+                <div class="message-bubble {% if msg.sender == request.user %}message-sent{% else %}message-received{% endif %}" data-id="{{ msg.id }}">
                     {{ msg.message }}
                     <span class="message-time">{{ msg.timestamp|date:"H:i" }}</span>
                 </div>
@@ -40,10 +40,63 @@
     const targetUserId = {{ target_user.id }};
     const currentUserId = {{ request.user.id }};
     
+    // Helper to append messages to UI
+    function appendMessage(data) {
+        const message = data.message;
+        const senderId = data.sender_id;
+        const msgId = data.id;
+        const timeString = data.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        // Avoid duplicates
+        if (document.querySelector(`.message-bubble[data-id="${msgId}"]`)) return;
+
+        const noMessages = document.querySelector('#no-messages');
+        if (noMessages) noMessages.remove();
+
+        const isMe = senderId === currentUserId;
+        const bubbleClass = isMe ? 'message-sent' : 'message-received';
+        
+        const messageHtml = `
+            <div class="message-bubble ${bubbleClass}" data-id="${msgId}">
+                ${message}
+                <span class="message-time">
+                    ${timeString}
+                    ${isMe ? '<i class="bi bi-check2-all text-primary"></i>' : ''}
+                </span>
+            </div>
+        `;
+        
+        const chatLog = document.querySelector('#chat-log');
+        chatLog.insertAdjacentHTML('beforeend', messageHtml);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    // WebSocket Setup with Fallback
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const chatSocket = new WebSocket(
-        protocol + window.location.host + '/ws/chat/' + targetUserId + '/'
-    );
+    let chatSocket = null;
+    let useHTTP = false;
+
+    try {
+        chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/' + targetUserId + '/');
+        
+        chatSocket.onopen = function() {
+            console.log("WebSocket Connected");
+        };
+        
+        chatSocket.onclose = function(e) {
+            console.log("WebSocket closed, switching to HTTP polling");
+            useHTTP = true;
+            startPolling();
+        };
+        
+        chatSocket.onerror = function(e) {
+            console.log("WebSocket error");
+            useHTTP = true;
+        };
+    } catch(e) {
+        useHTTP = true;
+        startPolling();
+    }
 
     const chatLog = document.querySelector('#chat-log');
     chatLog.scrollTop = chatLog.scrollHeight;
@@ -58,38 +111,30 @@
             }
             return;
         }
-
-        const message = data.message;
-        const senderId = data.sender_id;
-        
-        const noMessages = document.querySelector('#no-messages');
-        if (noMessages) {
-            noMessages.remove();
-        }
-
-        const isMe = senderId === currentUserId;
-        const bubbleClass = isMe ? 'message-sent' : 'message-received';
-        
-        const now = new Date();
-        const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-
-        const messageHtml = `
-            <div class="message-bubble ${bubbleClass}">
-                ${message}
-                <span class="message-time">
-                    ${timeString}
-                    ${isMe ? '<i class="bi bi-check2-all text-primary"></i>' : ''}
-                </span>
-            </div>
-        `;
-        
-        chatLog.insertAdjacentHTML('beforeend', messageHtml);
-        chatLog.scrollTop = chatLog.scrollHeight;
+        appendMessage(data);
     };
 
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
+    // Polling function for HTTP mode
+    function startPolling() {
+        setInterval(() => {
+            const bubbles = document.querySelectorAll('.message-bubble');
+            let lastId = 0;
+            if (bubbles.length > 0) {
+                lastId = bubbles[bubbles.length - 1].getAttribute('data-id') || 0;
+            }
+
+            fetch(window.location.href + '?last_id=' + lastId, {
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.messages) {
+                    data.messages.forEach(msg => appendMessage(msg));
+                }
+            })
+            .catch(err => console.error("Polling error:", err));
+        }, 3000); // Poll every 3 seconds
+    }
 
     let typingTimeout;
     const messageInput = document.querySelector('#chat-message-input');
@@ -101,21 +146,43 @@
         }
         
         // Send typing status
-        chatSocket.send(JSON.stringify({'typing': true}));
-        
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            chatSocket.send(JSON.stringify({'typing': false}));
-        }, 1000);
+        if (!useHTTP && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({'typing': true}));
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                chatSocket.send(JSON.stringify({'typing': false}));
+            }, 1000);
+        }
     };
 
     document.querySelector('#chat-message-submit').onclick = function(e) {
         const messageInputDom = document.querySelector('#chat-message-input');
         const message = messageInputDom.value;
         if (message.trim()) {
-            chatSocket.send(JSON.stringify({'message': message}));
-            messageInputDom.value = '';
-            chatSocket.send(JSON.stringify({'typing': false}));
+            if (useHTTP || chatSocket.readyState !== WebSocket.OPEN) {
+                // Send via HTTP AJAX
+                fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({'message': message})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        appendMessage(data);
+                        messageInputDom.value = '';
+                    }
+                });
+            } else {
+                // Send via WebSocket
+                chatSocket.send(JSON.stringify({'message': message}));
+                messageInputDom.value = '';
+                chatSocket.send(JSON.stringify({'typing': false}));
+            }
         }
     };
 </script>
