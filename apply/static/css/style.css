@@ -100,8 +100,14 @@ h1 {
     padding: 0 1%;
     text-decoration: none;
 }
+[data-theme="dark"] h1 {
+    color: var(--color-accent-1);
+}
 h3{
     background-color: #e0f7fa;
+}
+[data-theme="dark"] h3 {
+    background-color: transparent;
 }
 main {
   flex: 1;
@@ -1231,4 +1237,68 @@ footer a:hover {
     margin-top: -5px;
     opacity: 0.8;
     height: 18px;
+}
+
+.delete-msg-btn {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    cursor: pointer;
+    color: #dc3545;
+    font-size: 0.8rem;
+}
+
+.message-bubble:hover .delete-msg-btn {
+    display: block;
+}
+
+.rating-input i {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #e4e5e9;
+    transition: color 0.2s;
+    margin-right: 2px;
+}
+
+.rating-input i.active {
+    color: #ffc107;
+}
+
+.transition-transform {
+    transition: transform 0.2s ease;
+}
+.transition-transform:hover {
+    transform: translateY(-3px);
+}
+
+/* Theme Aware Utilities */
+.bg-theme-card {
+    background-color: var(--color-card-bg);
+    color: var(--color-text-dark);
+}
+
+.bg-theme-light {
+    background-color: #f8f9fa;
+    color: var(--color-text-dark);
+}
+
+[data-theme="dark"] .bg-theme-light {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.card, .list-group-item {
+    background-color: var(--color-card-bg);
+    color: var(--color-text-dark);
+    border-color: var(--glass-border);
+}
+
+.text-theme-primary { color: var(--color-text-dark); }
+
+/* Dark Mode Text Overrides */
+[data-theme="dark"] .text-muted {
+    color: #adb5bd !important;
+}
+[data-theme="dark"] .text-secondary {
+    color: #d1d5db !important;
 }

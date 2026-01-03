@@ -1,0 +1,50 @@
+{% extends "applications/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-theme-card">
+                    <h4 class="mb-0">Edit Comment</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rating:</label>
+                            <div class="rating-input">
+                                <i class="bi bi-star-fill {% if comment.rating >= 1 %}active{% else %}text-muted{% endif %}" data-value="1"></i>
+                                <i class="bi bi-star-fill {% if comment.rating >= 2 %}active{% else %}text-muted{% endif %}" data-value="2"></i>
+                                <i class="bi bi-star-fill {% if comment.rating >= 3 %}active{% else %}text-muted{% endif %}" data-value="3"></i>
+                                <i class="bi bi-star-fill {% if comment.rating >= 4 %}active{% else %}text-muted{% endif %}" data-value="4"></i>
+                                <i class="bi bi-star-fill {% if comment.rating >= 5 %}active{% else %}text-muted{% endif %}" data-value="5"></i>
+                            </div>
+                            <input type="hidden" name="rating" id="rating-input" value="{{ comment.rating }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment:</label>
+                            {{ form.content }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Comment</button>
+                        <a href="javascript:history.back()" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Go Back"><i class="bi bi-arrow-left"></i></a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.rating-input i').forEach(star => {
+        star.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            document.getElementById('rating-input').value = value;
+            document.querySelectorAll('.rating-input i').forEach(s => {
+                s.classList.toggle('active', s.getAttribute('data-value') <= value);
+                s.classList.toggle('text-muted', s.getAttribute('data-value') > value);
+            });
+        });
+    });
+</script>
+{% endblock %}

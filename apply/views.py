@@ -10,6 +10,7 @@ from django.urls import reverse
 from .models import Student, Course, Region, District, Session, Enrollment, User
 from users.models import Profile
 from .forms import StudentForm, CourseForm
+from chat.models import CourseComment
 
 def home(request):
     all_courses = Course.objects.all()
@@ -117,7 +118,8 @@ def student_detail(request, student_id):
 
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    return render(request, 'applications/course_detail.html', {'course': course})
+    avg_rating = CourseComment.objects.filter(course=course).aggregate(models.Avg('rating'))['rating__avg'] or 0.0
+    return render(request, 'applications/course_detail.html', {'course': course, 'avg_rating': avg_rating})
 
 @login_required
 def payment_instructions(request):

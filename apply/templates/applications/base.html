@@ -28,7 +28,12 @@
       <li><a href="{% url 'apply:course_list' %}">Courses</a></li>
       {% if user.is_authenticated %}
         <li><a href="{% url 'apply:application_start' %}">Apply</a></li>
-        <li><a href="{% url 'chat:chat_list' %}">Chat</a></li>
+        <li>
+          <a href="{% url 'chat:chat_list' %}" id="chat-nav-link">
+            Chat
+            <span class="badge bg-danger rounded-pill" style="font-size: 0.7em; vertical-align: top; {% if unread_count == 0 %}display: none;{% endif %}">{{ unread_count }}</span>
+          </a>
+        </li>
         {% if user.is_staff %}
           <li><a href="{% url 'apply:approve_payments_list' %}" class="btn-admin">Payments</a></li>
         {% endif %}
@@ -114,5 +119,32 @@
     <script src="{% static 'js/animations.js' %}"></script>
     <script src="{% static 'js/background-animation.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+      // Initialize Bootstrap Tooltips
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+    </script>
+
+    {% if user.is_authenticated %}
+    <script>
+      function updateUnreadCount() {
+          fetch("{% url 'chat:chat_list' %}?action=unread_count", {
+              headers: {'X-Requested-With': 'XMLHttpRequest'}
+          })
+          .then(response => response.json())
+          .then(data => {
+              const badge = document.querySelector('#chat-nav-link .badge');
+              if (badge) {
+                  badge.innerText = data.unread_count;
+                  badge.style.display = data.unread_count > 0 ? 'inline-block' : 'none';
+              }
+          });
+      }
+      setInterval(updateUnreadCount, 3000);
+    </script>
+    {% endif %}
 </body>
 </html>

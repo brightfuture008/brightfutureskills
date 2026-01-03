@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 import json
 from django.contrib.auth import get_user_model
@@ -12,6 +13,38 @@ User = get_user_model()
 
 @login_required
 def chat_view(request, user_id=None):
+    # --- AJAX: Get Unread Count ---
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.GET.get('action') == 'unread_count':
+        count = ChatMessage.objects.filter(receiver=request.user, is_read=False).count()
+        return JsonResponse({'unread_count': count})
+
+    # --- AJAX: Handle Actions (Delete, Mark Unread) ---
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')
+            
+            if action == 'delete_message':
+                msg_id = data.get('message_id')
+                # Ensure user owns the message
+                msg = ChatMessage.objects.filter(id=msg_id, sender=request.user).first()
+                if msg:
+                    msg.delete()
+                    return JsonResponse({'status': 'ok', 'deleted_id': msg_id})
+                return JsonResponse({'status': 'error', 'message': 'Message not found'})
+            
+            if action == 'mark_unread':
+                target_id = data.get('target_user_id')
+                # Mark the last message from this user as unread
+                last_msg = ChatMessage.objects.filter(sender_id=target_id, receiver=request.user).last()
+                if last_msg:
+                    last_msg.is_read = False
+                    last_msg.save()
+                    return JsonResponse({'status': 'ok'})
+                return JsonResponse({'status': 'error', 'message': 'No messages to mark'})
+        except json.JSONDecodeError:
+            pass
+
     target_user = None
     if user_id:
         target_user = get_object_or_404(User, id=user_id)
@@ -115,3 +148,32 @@ def add_comment(request, course_id):
             return redirect(request.META.get('HTTP_REFERER', '/'))
     
     return redirect('/')
+
+@login_required
+def update_comment(request, comment_id):
+    comment = get_object_or_404(CourseComment, id=comment_id)
+    
+    # Only owner can edit
+    if comment.user != request.user:
+        raise PermissionDenied
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            # Redirect to the course page (using the comment's course ID if possible, or referer)
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+    else:
+        form = CommentForm(instance=comment)
+    
+    return render(request, 'chat/edit_comment.html', {'form': form, 'comment': comment})
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(CourseComment, id=comment_id)
+    
+    # Owner or Staff can delete
+    if comment.user == request.user or request.user.is_staff:
+        comment.delete()
+    
+    return redirect(request.META.get('HTTP_REFERER', '/'))
