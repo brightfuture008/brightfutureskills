@@ -1,54 +1,180 @@
 {% extends "applications/base.html" %}
 
-{% block title %}My Application Details{% endblock %}
+{% block title %}
+    {% if is_admitted %}
+        Admission Success
+    {% else %}
+        My Application Details
+    {% endif %}
+{% endblock %}
 
 {% block content %}
-<div class="course-details">
-    <h2>My Application Details</h2>
-    <p><strong>Application ID:</strong> {{ student.code }}</p>
-    <p><strong>Full Name:</strong> {{ student.fullname }}</p>
-    <p><strong>Email:</strong> {{ student.email }}</p>
-    <p><strong>Phone:</strong> {{ student.phone }}</p>
-    <p><strong>Gender:</strong> {{ student.get_gender_display }}</p>
-    <p><strong>Region:</strong> {{ student.region.name|default:"Not specified" }}</p>
-    <p><strong>District:</strong> {{ student.district.name|default:"Not specified" }}</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            {% if is_admitted %}
+                <!-- Success View for Admitted Students -->
+                <div class="card shadow-lg border-0 rounded-3 text-center mb-5">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                        </div>
+                        <h1 class="display-5 fw-bold text-success mb-3">Congratulations!</h1>
+                        <p class="lead mb-4">
+                            Dear <strong>{{ student.fullname }}</strong>, we are pleased to inform you that your application has been accepted. 
+                            You have been admitted to the Bright Skills Development Center.
+                        </p>
+                        
+                        <div class="d-grid gap-3 d-sm-flex justify-content-center mb-4">
+                            <a href="{% url 'apply:admission_letter' %}" class="btn btn-primary btn-lg px-5 shadow-sm" target="_blank">
+                                <i class="bi bi-file-earmark-pdf me-2"></i> Download Admission Letter
+                            </a>
+                        </div>
 
-    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Course Selections</h3>
-    {% if student.enrollments.all %}
-        <div class="results">
-            <table id="result_list">
-                <thead>
-                    <tr>
-                        <th scope="col">Choice</th>
-                        <th scope="col">Course Title</th>
-                        <th scope="col">Session</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for enrollment in student.enrollments.all %}
-                    <tr class="{% cycle 'row1' 'row2' %}">
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ enrollment.course.title }}</td>
-                        <td>{{ enrollment.session.name }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        <div class="alert alert-success d-inline-block">
+                            <i class="bi bi-check-all me-2"></i> You have successfully enrolled in courses.
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light py-3">
+                        <button class="btn btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#applicationDetails" aria-expanded="false" aria-controls="applicationDetails">
+                            View My Profile Details <i class="bi bi-chevron-down ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Collapsible Details Section -->
+                <div class="collapse" id="applicationDetails">
+            {% endif %}
+
+            <div class="card shadow-sm border-0 rounded-3 {% if is_admitted %}mt-4{% endif %}">
+                {% if not is_admitted %}
+                <div class="card-header bg-primary text-white p-4 rounded-top-3">
+                    <h2 class="h3 mb-0 fw-bold">My Application Details</h2>
+                </div>
+                {% endif %}
+                
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- Personal Information Section -->
+                    <div class="mb-5">
+                        <h3 class="h5 text-primary fw-bold border-bottom pb-2 mb-4">Personal Information</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Application ID</label>
+                                <div class="fs-5">{{ student.code }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Full Name</label>
+                                <div class="fs-5">{{ student.fullname }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Email</label>
+                                <div>{{ student.email }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Phone</label>
+                                <div>{{ student.phone }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Gender</label>
+                                <div>{{ student.get_gender_display }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Location</label>
+                                <div>{{ student.district.name|default:"-" }}, {{ student.region.name|default:"-" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Selections Section -->
+                    <div class="mb-5">
+                        <h3 class="h5 text-primary fw-bold border-bottom pb-2 mb-4">Course Selections</h3>
+                        {% if student.enrollments.all %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" style="width: 10%;">#</th>
+                                            <th scope="col" style="width: 50%;">Course Title</th>
+                                            <th scope="col" style="width: 40%;">Session</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for enrollment in student.enrollments.all %}
+                                        <tr>
+                                            <td><span class="badge bg-secondary rounded-pill">{{ forloop.counter }}</span></td>
+                                            <td class="fw-bold">{{ enrollment.course.title }}</td>
+                                            <td class="text-muted">{{ enrollment.session.name }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <div>You have not selected any courses yet.</div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Application Status Section -->
+                    {% if not is_admitted %}
+                    <div class="mb-5">
+                        <h3 class="h5 text-primary fw-bold border-bottom pb-2 mb-4">Application Status</h3>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <label class="small text-muted text-uppercase fw-bold d-block mb-1">Admission Status</label>
+                                {% if is_admitted %}
+                                    <span class="badge bg-success fs-6 px-3 py-2">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Admitted
+                                    </span>
+                                {% elif student.user.profile.payment_status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                                        <i class="bi bi-hourglass-split me-1"></i> Under Review
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6 px-3 py-2">
+                                        <i class="bi bi-pencil-square me-1"></i> In Progress / Revision Needed
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    {% if not is_admitted %}
+                    <div class="d-flex flex-wrap gap-3 pt-3 border-top">
+                        {% if student.user.profile.payment_status != 'APPROVED' %}
+                            <a href="{% url 'apply:payment' %}" class="btn btn-success btn-lg">
+                                <i class="bi bi-send me-2"></i> Submit Payment
+                            </a>
+                        {% elif not student.enrollments.all %}
+                            <a href="{% url 'apply:course_request' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-journal-plus me-2"></i> Select Courses
+                            </a>
+                        {% else %}
+                            <div class="alert alert-info w-100">
+                                <i class="bi bi-clock-history me-2"></i> Your course selection is awaiting Admin Confirmation.
+                            </div>
+                        {% endif %}
+                        
+                        <a href="{% url 'apply:edit_student' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-pencil-square me-2"></i> Edit Personal Info
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+            
+            {% if is_admitted %}
+                </div> <!-- End Collapse -->
+            {% endif %}
+
         </div>
-    {% else %}
-        <p>You have not selected any courses yet.</p>
-    {% endif %}
-
-    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Application Status</h3>
-    <p><strong>Payment Status:</strong> {{ student.user.profile.get_payment_status_display }}</p>
-
-    <div class="details-actions">
-        {% if student.user.profile.payment_status != 'APPROVED' %}
-            <a href="{% url 'apply:payment' %}" class="btn">Proceed to Payment</a>
-        {% elif not student.enrollments.all %}
-            <a href="{% url 'apply:course_request' %}" class="btn">Proceed to Course Selection</a>
-        {% endif %}
-        <a href="{% url 'apply:edit_student' %}" class="btn">Edit Personal Info</a>
     </div>
 </div>
 {% endblock %}

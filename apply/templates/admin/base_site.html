@@ -11,6 +11,14 @@
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">{% endblock %}
 
+{% block userlinks %}
+    <a href="{% url 'custom_admin:confirm_admission_list' %}" style="color: #28a745; font-weight: bold;">Confirm Admissions</a>
+    &nbsp;|&nbsp;
+    <a href="{% url 'custom_admin:payments_list' %}" style="color: #ffc107; font-weight: bold;">Approve Payments</a>
+    &nbsp;|&nbsp;
+    {{ block.super }}
+{% endblock %}
+
 {% block footer %}
 {{ block.super }}
 {% endblock %}

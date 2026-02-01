@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admission Letter - {{ student.fullname }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: #525659; 
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .letter-page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 30px auto;
+            padding: 25mm;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 1px solid #e0e0e0;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(0, 0, 0, 0.03);
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            border: 5px solid rgba(0, 0, 0, 0.03);
+            padding: 10px 40px;
+            border-radius: 20px;
+        }
+        .page-border {
+            border: 3px double #0d6efd;
+            height: 100%;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        .header { border-bottom: 2px solid #0d6efd; padding-bottom: 20px; margin-bottom: 40px; }
+        .logo-text { font-size: 28px; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 1px; }
+        .ref-date { display: flex; justify-content: space-between; margin-bottom: 40px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .content { font-size: 12pt; line-height: 1.8; position: relative; z-index: 1; text-align: justify; }
+        .signature { margin-top: 60px; }
+        .footer { 
+            position: absolute; bottom: 15mm; left: 25mm; right: 25mm; 
+            text-align: center; font-size: 10pt; color: #666; border-top: 1px solid #ddd; padding-top: 10px;
+        }
+        @media print {
+            body { background: white; }
+            .letter-page { box-shadow: none; margin: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-3 no-print text-center">
+        <button onclick="window.print()" class="btn btn-primary btn-lg shadow">
+            <i class="bi bi-printer"></i> Print / Download PDF
+        </button>
+        <a href="{% url 'apply:student_profile' %}" class="btn btn-secondary btn-lg ms-2">Back to Dashboard</a>
+    </div>
+
+    <div class="letter-page">
+        <div class="watermark">OFFICIAL ADMISSION</div>
+        
+        <div class="page-border">
+            <div class="header text-center">
+                <div class="logo-text">Bright Skills Development Center</div>
+                <div class="small text-muted">Excellence in Professional Training</div>
+                <div class="small mt-2">P.O. Box 1234, Dar es Salaam, Tanzania</div>
+                <div class="small">Email: admissions@brightskills.co.tz | Tel: +255 123 456 789</div>
+            </div>
+
+            <div class="ref-date">
+                <div><strong>Ref No:</strong> BSK/ADM/{{ student.code }}</div>
+                <div><strong>Date:</strong> {{ date|date:"F d, Y" }}</div>
+            </div>
+
+            <div class="mb-5">
+                <strong>To:</strong><br>
+                <span class="text-uppercase">{{ student.fullname }}</span><br>
+                {{ student.district.name }}, {{ student.region.name }}<br>
+                {{ student.phone_number }}
+            </div>
+
+            <div class="content">
+                <h4 class="text-center text-uppercase fw-bold text-decoration-underline mb-5">RE: {% if student.enrollments.all %}OFFICIAL{% else %}PROVISIONAL{% endif %} ADMISSION LETTER</h4>
+
+                <p>Dear <strong>{{ student.first_name }}</strong>,</p>
+
+                {% now "Y" as current_year %}
+                <p>We are pleased to inform you that you have been offered a provisional admission to pursue professional courses at <strong>Bright Skills Development Center</strong> for the academic year <strong>{{ current_year }}/{{ current_year|add:"1" }}</strong>.</p>
+
+                <p>Your admission details are as follows:</p>
+                <div class="ps-4 mb-3 border-start border-4 border-primary bg-light p-3">
+                    <p class="mb-1"><strong>Student Registration Number:</strong> {{ student.code }}</p>
+                    <p class="mb-0"><strong>Admission Status:</strong> <span class="text-success fw-bold">APPROVED</span></p>
+                </div>
+
+                {% if student.enrollments.all %}
+                    <p>We confirm that you have successfully registered for the following course(s):</p>
+                    <ul>
+                        {% for enrollment in student.enrollments.all %}
+                            <li><strong>{{ enrollment.course.title }}</strong> - {{ enrollment.session.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p>Please report to the campus for orientation and commencement of studies.</p>
+                {% else %}
+                    <p>You are now required to proceed to the <strong>Course Selection</strong> module on your student dashboard to select your preferred courses and session timings. Please note that class allocation is subject to availability.</p>
+                {% endif %}
+                
+                <p>We look forward to welcoming you to our campus and wish you success in your studies.</p>
+
+                <p>Sincerely,</p>
+            </div>
+
+            <div class="signature">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Signature_sample.svg/1200px-Signature_sample.svg.png" width="150" alt="Signature" style="opacity: 0.7"><br>
+                <strong>Dr. John Principal</strong><br>
+                Dean of Admissions<br>
+                Bright Skills Development Center
+            </div>
+        </div>
+
+        <div class="footer">
+            <em>This is a computer-generated document. Valid without a signature. | System Generated on {% now "F d, Y H:i" %}</em>
+        </div>
+    </div>
+</body>
+</html>

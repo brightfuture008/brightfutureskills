@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Confirm Student Admissions</h1>
+    
+    <form method="post" action="">
+    {% csrf_token %}
+    
+    {% if students %}
+    <div class="actions" style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+        <button type="submit" class="button" style="background: #28a745; color: white; padding: 8px 15px; text-decoration: none; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            Confirm Selected Students
+        </button>
+    </div>
+
+    <div class="module">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; text-align: left;">
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd; width: 40px;"><input type="checkbox" id="action-toggle"></th>
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd;">Student Name</th>
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd;">Email</th>
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd;">Selected Courses</th>
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">
+                        <input type="checkbox" name="student_ids" value="{{ student.id }}" class="action-select">
+                    </td>
+                    <td style="padding: 10px;">
+                        <a href="{% url 'custom_admin:apply_student_change' student.id %}">{{ student.fullname }}</a>
+                    </td>
+                    <td style="padding: 10px;">{{ student.email }}</td>
+                    <td style="padding: 10px;">
+                        {% for enrollment in student.enrollments.all %}
+                            {{ enrollment.course.title }} ({{ enrollment.session.name }})<br>
+                        {% endfor %}
+                    </td>
+                    <td style="padding: 10px;">
+                        <a href="{% url 'custom_admin:confirm_student_admission' student.id %}" class="button" style="background: #28a745; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px;">Confirm Admission</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No students waiting for admission confirmation.</p>
+    {% endif %}
+    
+    </form>
+</div>
+
+<script>
+    document.getElementById('action-toggle').addEventListener('change', function() {
+        var checkboxes = document.querySelectorAll('.action-select');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = this.checked;
+        }
+    });
+</script>
+{% endblock %}

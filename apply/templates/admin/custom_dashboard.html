@@ -1,0 +1,23 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="module" style="margin-bottom: 20px; padding: 20px; background: #fff; border: 1px solid #e0e0e0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <h2 style="margin-top: 0; margin-bottom: 15px; font-size: 18px; color: #333;">Administrative Actions</h2>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{% url 'custom_admin:confirm_admission_list' %}" class="button" style="background: #28a745; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-flex; align-items: center; font-weight: bold;">
+            Confirm Admissions
+            {% if pending_admission_count > 0 %}
+            <span style="background: white; color: #28a745; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ pending_admission_count }}</span>
+            {% endif %}
+        </a>
+        <a href="{% url 'custom_admin:payments_list' %}" class="button" style="background: #ffc107; color: #333; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-flex; align-items: center; font-weight: bold;">
+            Approve Payments
+            {% if pending_payment_count > 0 %}
+            <span style="background: white; color: #333; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ pending_payment_count }}</span>
+            {% endif %}
+        </a>
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

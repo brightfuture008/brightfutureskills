@@ -25,4 +25,6 @@ urlpatterns = [
     path('mark-as-paid/', views.mark_as_paid, name='mark_as_paid'),
     path('manage/approve-payments/', views.approve_payments_list, name='approve_payments_list'),
     path('manage/approve/<int:user_id>/', views.approve_user_payment, name='approve_user_payment'),
+    path('manage/reject/<int:user_id>/', views.reject_user_payment, name='reject_user_payment'),
+    path('admission-letter/', views.admission_letter, name='admission_letter'),
 ]

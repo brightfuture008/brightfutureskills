@@ -4,13 +4,15 @@ from django.contrib import messages
 from django.db import transaction, models
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.contrib.auth.models import Group
 from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
+from django.utils import timezone
 from .models import Student, Course, Region, District, Session, Enrollment, User
 from users.models import Profile
 from .forms import StudentForm, CourseForm
-from chat.models import CourseComment
+from chat.models import CourseComment, ChatMessage
 
 def home(request):
     all_courses = Course.objects.all()
@@ -41,7 +43,7 @@ def personal_info_view(request):
             student.user = request.user
             student.save()
             messages.success(request, 'Personal information has been saved successfully.')
-            return redirect('apply:payment')
+            return redirect('apply:student_profile')
     else:
         form = StudentForm(instance=student_instance)
     
@@ -178,20 +180,139 @@ def mark_as_paid(request):
         )
 
         messages.success(request, "Thank you! The admin has been notified. Your payment will be reviewed shortly.")
-    return redirect('apply:payment_instructions')
+    return redirect('apply:student_profile')
 
 @login_required
 def approve_user_payment(request, user_id):
     user_to_approve = get_object_or_404(User, id=user_id)
     user_to_approve.profile.payment_status = Profile.PaymentStatus.APPROVED
     user_to_approve.profile.save()
-    messages.success(request, f"Payment for {user_to_approve.username} has been approved.")
+    
+    # Automate Chat Message
+    welcome_msg = (
+        f"Dear {user_to_approve.username},\n\n"
+        "Congratulations! Your application has been reviewed and you have been selected for admission.\n\n"
+        "You can now download your official Admission Letter from your dashboard and proceed with course selection.\n\n"
+        "Welcome to Bright Skills Development Center!"
+    )
+    ChatMessage.objects.create(
+        sender=request.user,
+        receiver=user_to_approve,
+        message=welcome_msg
+    )
+
+    # Send Email Notification
+    subject = "Admission Approved - Bright Skills Development Center"
+    email_message = (
+        f"Dear {user_to_approve.username},\n\n"
+        "Congratulations! We are pleased to inform you that your application to Bright Skills Development Center has been approved.\n\n"
+        "You can now log in to your student dashboard to:\n"
+        "1. Download your official Admission Letter.\n"
+        "2. Select your preferred courses and sessions.\n\n"
+        f"Login here: {request.build_absolute_uri(reverse('users:login'))}\n\n"
+        "Welcome to our community!\n\n"
+        "Best regards,\n"
+        "Admissions Team\n"
+        "Bright Skills Development Center"
+    )
+    
+    send_mail(subject, email_message, None, [user_to_approve.email], fail_silently=True)
+    
+    messages.success(request, f"Payment for {user_to_approve.username} has been approved and notification sent.")
     return redirect('apply:approve_payments_list')
+
+@login_required
+def reject_user_payment(request, user_id):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to perform this action.")
+        return redirect('apply:home')
+
+    user_to_reject = get_object_or_404(User, id=user_id)
+    # Reset to UNPAID so they can edit/resubmit
+    user_to_reject.profile.payment_status = Profile.PaymentStatus.UNPAID 
+    user_to_reject.profile.save()
+    
+    # Send Rejection Message
+    rejection_msg = (
+        f"Dear {user_to_reject.username},\n\n"
+        "Your application has been reviewed. Unfortunately, we require some changes or additional information.\n"
+        "Please log in to your dashboard, update your details, and resubmit your application.\n\n"
+        "Regards,\nAdmissions Team"
+    )
+    ChatMessage.objects.create(
+        sender=request.user,
+        receiver=user_to_reject,
+        message=rejection_msg
+    )
+    
+    messages.warning(request, f"Application for {user_to_reject.username} has been rejected/returned for revision.")
+    return redirect('apply:approve_payments_list')
+
+@login_required
+def confirm_admission_list(request):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('apply:home')
+    
+    # Ensure group exists
+    admitted_group, _ = Group.objects.get_or_create(name='Admitted')
+    
+    if request.method == 'POST':
+        student_ids = request.POST.getlist('student_ids')
+        if student_ids:
+            students = Student.objects.filter(id__in=student_ids)
+            count = 0
+            for student in students:
+                if not student.user.groups.filter(name='Admitted').exists():
+                    student.user.groups.add(admitted_group)
+                    
+                    # Notification
+                    msg = (
+                        f"Dear {student.user.username},\n\n"
+                        "Your course selection has been confirmed by the administration.\n"
+                        "You have been officially ADMITTED. You can now download your Admission Letter from your dashboard."
+                    )
+                    ChatMessage.objects.create(sender=request.user, receiver=student.user, message=msg)
+                    count += 1
+            
+            if count > 0:
+                messages.success(request, f"Successfully admitted {count} students.")
+            return redirect('custom_admin:confirm_admission_list')
+        else:
+            messages.warning(request, "No students selected.")
+    
+    # Students with enrollments but not in Admitted group
+    students = Student.objects.filter(enrollments__isnull=False).exclude(user__groups__name='Admitted').distinct()
+    
+    return render(request, 'admin/confirm_admission_list.html', {'students': students})
+
+@login_required
+def confirm_student_admission(request, student_id):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to perform this action.")
+        return redirect('apply:home')
+
+    student = get_object_or_404(Student, id=student_id)
+    admitted_group, _ = Group.objects.get_or_create(name='Admitted')
+    student.user.groups.add(admitted_group)
+    
+    # Notification
+    msg = (
+        f"Dear {student.user.username},\n\n"
+        "Your course selection has been confirmed by the administration.\n"
+        "You have been officially ADMITTED. You can now download your Admission Letter from your dashboard."
+    )
+    ChatMessage.objects.create(sender=request.user, receiver=student.user, message=msg)
+    
+    messages.success(request, f"Student {student.fullname} has been admitted.")
+    return redirect('custom_admin:confirm_admission_list')
 
 @login_required
 def student_profile(request):
     student = get_object_or_404(Student, user=request.user)
-    return render(request, 'applications/student_detail.html', {'student': student})
+    # Check if student is in 'Admitted' group
+    is_admitted = request.user.groups.filter(name='Admitted').exists()
+    return render(request, 'applications/student_detail.html', {'student': student, 'is_admitted': is_admitted})
 
 def enroll_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -229,3 +350,16 @@ def ajax_sessions(request, course_id):
     except Course.DoesNotExist:
         sessions = []
     return JsonResponse({'sessions': sessions})
+
+@login_required
+def admission_letter(request):
+    student = get_object_or_404(Student, user=request.user)
+    if not request.user.groups.filter(name='Admitted').exists():
+        messages.error(request, "Your admission has not been confirmed by the admin yet.")
+        return redirect('apply:student_profile')
+        
+    context = {
+        'student': student,
+        'date': timezone.now(),
+    }
+    return render(request, 'applications/admission_letter.html', context)
